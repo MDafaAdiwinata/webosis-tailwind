@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    scroll-padding-top: 60px;
+    scroll-behavior: smooth;
+
+    --bg-primary: #2d2d2f;
+    --bg-secondary: #ffc814;
+    --bg-secondary2: #cb282d;
+    --bg-secondary3: #fbf5e7;
+
+    --bg-navbar-mobile: #1b1b1d;
+
+    --txt-primary: #ffffff;
+    --txt-primary2: #2d2d2f;
+  }
+}
+
+#heroSection {
+  background: url(../assets/img/bg-hero.png) no-repeat center ;
+  background-size: cover;
+}
