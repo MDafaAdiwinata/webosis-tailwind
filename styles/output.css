@@ -218,9 +218,6 @@
   }
 }
 @layer utilities {
-  .collapse {
-    visibility: collapse;
-  }
   .sr-only {
     position: absolute;
     width: 1px;
@@ -240,9 +237,6 @@
   }
   .relative {
     position: relative;
-  }
-  .static {
-    position: static;
   }
   .start-0 {
     inset-inline-start: calc(var(--spacing) * 0);
@@ -336,9 +330,6 @@
   }
   .me-0 {
     margin-inline-end: calc(var(--spacing) * 0);
-  }
-  .me-1 {
-    margin-inline-end: calc(var(--spacing) * 1);
   }
   .me-3 {
     margin-inline-end: calc(var(--spacing) * 3);
@@ -484,17 +475,11 @@
   .w-full {
     width: 100%;
   }
-  .max-w-2 {
-    max-width: calc(var(--spacing) * 2);
-  }
   .max-w-2xl {
     max-width: var(--container-2xl);
   }
   .max-w-6xl {
     max-width: var(--container-6xl);
-  }
-  .max-w-lg {
-    max-width: var(--container-lg);
   }
   .max-w-md {
     max-width: var(--container-md);
@@ -782,47 +767,11 @@
   .border-yellow-500 {
     border-color: var(--color-yellow-500);
   }
-  .bg-\[v\] {
-    background-color: v;
-  }
-  .bg-\[va\] {
-    background-color: va;
-  }
-  .bg-\[var\(\)\] {
-    background-color: var();
-  }
-  .bg-\[var\(-\)\] {
-    background-color: var(-);
-  }
-  .bg-\[var\(--\)\] {
-    background-color: var(--);
-  }
-  .bg-\[var\(--b\)\] {
-    background-color: var(--b);
-  }
-  .bg-\[var\(--bg\)\] {
-    background-color: var(--bg);
-  }
-  .bg-\[var\(--bg-\)\] {
-    background-color: var(--bg-);
-  }
   .bg-\[var\(--bg-navbar-mobile\)\] {
     background-color: var(--bg-navbar-mobile);
   }
   .bg-\[var\(--bg-primary\)\] {
     background-color: var(--bg-primary);
-  }
-  .bg-\[var\(--bg-se\)\] {
-    background-color: var(--bg-se);
-  }
-  .bg-\[var\(--bg-sec\)\] {
-    background-color: var(--bg-sec);
-  }
-  .bg-\[var\(--bg-seco\)\] {
-    background-color: var(--bg-seco);
-  }
-  .bg-\[var\(--bg-seconda\)\] {
-    background-color: var(--bg-seconda);
   }
   .bg-\[var\(--bg-secondary\)\] {
     background-color: var(--bg-secondary);
@@ -838,30 +787,6 @@
   }
   .bg-\[var\(--bg-secondary3\)\] {
     background-color: var(--bg-secondary3);
-  }
-  .bg-\[var\(--bg-secondary3\)\]\/0 {
-    background-color: var(--bg-secondary3);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-secondary3) 0%, transparent);
-    }
-  }
-  .bg-\[var\(--bg-secondary3\)\]\/1 {
-    background-color: var(--bg-secondary3);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-secondary3) 1%, transparent);
-    }
-  }
-  .bg-\[var\(--bg-secondary3\)\]\/2 {
-    background-color: var(--bg-secondary3);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-secondary3) 2%, transparent);
-    }
-  }
-  .bg-\[var\(--bg-secondary3\)\]\/10 {
-    background-color: var(--bg-secondary3);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-secondary3) 10%, transparent);
-    }
   }
   .bg-\[var\(--bg-secondary3\)\]\/20 {
     background-color: var(--bg-secondary3);
@@ -881,14 +806,8 @@
       background-color: color-mix(in oklab, var(--bg-secondary3) 50%, transparent);
     }
   }
-  .bg-\[var\(--bgs\)\] {
-    background-color: var(--bgs);
-  }
   .bg-\[var\(--txt-primary\)\] {
     background-color: var(--txt-primary);
-  }
-  .bg-\[var\] {
-    background-color: var;
   }
   .bg-gray-200 {
     background-color: var(--color-gray-200);
@@ -934,6 +853,12 @@
   }
   .p-8 {
     padding: calc(var(--spacing) * 8);
+  }
+  .px-2 {
+    padding-inline: calc(var(--spacing) * 2);
+  }
+  .px-2\.5 {
+    padding-inline: calc(var(--spacing) * 2.5);
   }
   .px-3 {
     padding-inline: calc(var(--spacing) * 3);
@@ -1105,12 +1030,6 @@
   .text-\[var\(--txt-primary\)\] {
     color: var(--txt-primary);
   }
-  .text-\[var\(--txt-primary\)\]\/5 {
-    color: var(--txt-primary);
-    @supports (color: color-mix(in lab, red, red)) {
-      color: color-mix(in oklab, var(--txt-primary) 5%, transparent);
-    }
-  }
   .text-\[var\(--txt-primary\)\]\/50 {
     color: var(--txt-primary);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1255,59 +1174,10 @@
       }
     }
   }
-  .hover\:bg-\[v\] {
+  .hover\:border-\[var\(--bg-primary\)\] {
     &:hover {
       @media (hover: hover) {
-        background-color: v;
-      }
-    }
-  }
-  .hover\:bg-\[va\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: va;
-      }
-    }
-  }
-  .hover\:bg-\[var\(\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var();
-      }
-    }
-  }
-  .hover\:bg-\[var\(-\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(-);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--b\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--b);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg-\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-);
+        border-color: var(--bg-primary);
       }
     }
   }
@@ -1338,55 +1208,6 @@
         @supports (color: color-mix(in lab, red, red)) {
           background-color: color-mix(in oklab, var(--bg-primary) 80%, transparent);
         }
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg-s\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-s);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg-se\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-se);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg-sec\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-sec);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg-seco\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-seco);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg-second\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-second);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg-seconda\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-seconda);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg-secondar\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-secondar);
       }
     }
   }
@@ -1447,13 +1268,6 @@
       }
     }
   }
-  .hover\:bg-\[var\(--bg-secondary2\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-secondary2);
-      }
-    }
-  }
   .hover\:bg-\[var\(--bg-secondary2\)\]\/20 {
     &:hover {
       @media (hover: hover) {
@@ -1478,16 +1292,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--bg-secondary3);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bg-secondary3\)\]\/1 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-secondary3);
-        @supports (color: color-mix(in lab, red, red)) {
-          background-color: color-mix(in oklab, var(--bg-secondary3) 1%, transparent);
-        }
       }
     }
   }
@@ -1541,55 +1345,6 @@
       }
     }
   }
-  .hover\:bg-\[var\(--bgs\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bgs);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bgs-\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bgs-);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bgse\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bgse);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bgsec\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bgsec);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bgseco\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bgseco);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bgsecon\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bgsecon);
-      }
-    }
-  }
-  .hover\:bg-\[var\(--bgsecond\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bgsecond);
-      }
-    }
-  }
   .hover\:bg-\[var\(--txt-primary\)\]\/10 {
     &:hover {
       @media (hover: hover) {
@@ -1597,13 +1352,6 @@
         @supports (color: color-mix(in lab, red, red)) {
           background-color: color-mix(in oklab, var(--txt-primary) 10%, transparent);
         }
-      }
-    }
-  }
-  .hover\:bg-\[var\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var;
       }
     }
   }
@@ -2354,6 +2102,11 @@
   .lg\:grid-cols-2 {
     @media (width >= 64rem) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .lg\:grid-cols-3 {
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   .lg\:grid-cols-4 {

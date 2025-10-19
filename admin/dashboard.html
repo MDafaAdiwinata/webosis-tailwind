@@ -184,7 +184,7 @@
                     </button>
                     <ul id="dropdownPortalLomba" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="#"
+                            <a href="portal-lomba/main-content.html"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -199,11 +199,11 @@
                         </li>
 
                         <li>
-                            <a href="#"
+                            <a href="portal-lomba/SyaratKetentuan.html"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    fill="currentColor" viewBox="0 0 24 24">
                                     <path
                                         d="M10.83 5a3.001 3.001 0 0 0-5.66 0H4a1 1 0 1 0 0 2h1.17a3.001 3.001 0 0 0 5.66 0H20a1 1 0 1 0 0-2h-9.17ZM4 11h9.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-1.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2Zm1.17 6H4a1 1 0 1 0 0 2h1.17a3.001 3.001 0 0 0 5.66 0H20a1 1 0 1 0 0-2h-9.17a3.001 3.001 0 0 0-5.66 0Z" />
                                 </svg>
@@ -212,7 +212,7 @@
                         </li>
 
                         <li>
-                            <a href="#"
+                            <a href="portal-lomba/atur-form.html"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -280,24 +280,6 @@
                                         d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z" />
                                 </svg>
                                 <span class="ms-3">Aspirasi</span></a>
-                        </li>
-
-                        <li>
-                            <a href="../interaksi/atur-form.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd"
-                                        d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
-                                        clip-rule="evenodd" />
-                                    <path fill-rule="evenodd"
-                                        d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span class="ms-3">Atur Form</span>
-                            </a>
                         </li>
                     </ul>
                 </li>
@@ -460,6 +442,36 @@
     </div>
 
     <!-- Tutup Main Content Dashboard -->
+
+    <!-- Script Inline - Open Dropdown Sidebar -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const dropdownButtons = document.querySelectorAll("[data-collapse-toggle]");
+
+            dropdownButtons.forEach((button) => {
+                const targetId = button.getAttribute("data-collapse-toggle");
+                const target = document.getElementById(targetId);
+                const arrow = button.querySelector("svg:last-of-type"); // ambil panah kecil di kanan
+
+                // 1️⃣ Saat halaman dimuat, cek status dari localStorage
+                const isOpen = localStorage.getItem(targetId) === "true";
+                if (isOpen) {
+                    target.classList.remove("hidden");
+                    if (arrow) arrow.classList.add("rotate-180");
+                }
+
+                // 2️⃣ Klik tombol -> toggle dropdown + simpan status
+                button.addEventListener("click", () => {
+                    target.classList.toggle("hidden");
+                    if (arrow) arrow.classList.toggle("rotate-180");
+
+                    const openNow = !target.classList.contains("hidden");
+                    localStorage.setItem(targetId, openNow);
+                });
+            });
+        });
+
+    </script>
 
     <!-- Flowbite Script -->
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
