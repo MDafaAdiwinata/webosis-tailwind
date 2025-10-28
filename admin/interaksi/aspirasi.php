@@ -1,10 +1,134 @@
-<!DOCTYPE html>
+<?php
+
+include "../../koneksi.php";
+session_start();
+if (!isset($_SESSION['username'])) {
+    echo "
+    <script>
+        alert('Silahkan Login Terlebih Dahulu!');
+        window.location.href = '../index.php';
+    </script>
+    ";
+}
+
+// Menyiapkan variabel untuk pesan alert dari session
+$alert_message = '';
+if (isset($_SESSION['alert_message'])) {
+    $alert_message = $_SESSION['alert_message'];
+    unset($_SESSION['alert_message']); // Hapus pesan dari session agar tidak tampil lagi
+}
+
+// UPDATE DATA
+if (isset($_POST['update_data'])) {
+    $id_forum = mysqli_real_escape_string($koneksi, $_POST['id_forum']);
+    $tujuan_aspirasi = mysqli_real_escape_string($koneksi, $_POST['tujuan_aspirasi']);
+    $komentar_forum = mysqli_real_escape_string($koneksi, $_POST['komentar_forum']);
+
+    mysqli_query($koneksi, "UPDATE tb_forum_aspirasi SET 
+        tujuan_aspirasi = '$tujuan_aspirasi', 
+        komentar_forum = '$komentar_forum' 
+        WHERE id_forum = '$id_forum'");
+
+
+    $_SESSION['alert_message'] = '
+            <div id="alert-2" class="flex items-center p-4 text-[var(--text-success)] rounded-2xl bg-[var(--bg-success)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                    Data Aspirasi telah berhasil diperbarui.
+                </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-success)]/30 text-[var(--text-success)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-success)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>';
+    header("Location: aspirasi.php");
+    exit;
+}
+
+// DELETE DATA
+if (isset($_GET['kode'])) {
+    $id_forum = mysqli_real_escape_string($koneksi, $_GET['kode']);
+    mysqli_query($koneksi, "DELETE FROM tb_forum_aspirasi WHERE id_forum='$id_forum'");
+
+
+    $_SESSION['alert_message'] = '
+            <div id="alert-2" class="flex items-center p-4 text-[var(--text-success)] rounded-2xl bg-[var(--bg-success)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                    Data Aspirasi telah berhasil dihapus.
+                </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-success)]/30 text-[var(--text-success)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-success)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>';
+    header("Location: aspirasi.php");
+    exit;
+}
+
+// Fitur Filter
+$tujuan_aspirasi = isset($_GET['tujuan_aspirasi']) ? $_GET['tujuan_aspirasi'] : '';
+$urutkan_data = isset($_GET['urutkan_data']) ? $_GET['urutkan_data'] : '';
+$search   = isset($_GET['search']) ? $_GET['search'] : '';
+
+// Bangun query
+$sql = "SELECT * FROM tb_forum_aspirasi WHERE 1=1";
+
+if ($tujuan_aspirasi != '') {
+    $sql .= " AND tujuan_aspirasi = '$tujuan_aspirasi'";
+}
+if ($search != '') {
+    $sql .= " AND (tujuan_aspirasi LIKE '%$search%' or komentar_forum LIKE '%$search%')";
+}
+if ($urutkan_data == 'terbaru') {
+    $sql .= " ORDER BY id_forum DESC";
+} elseif ($urutkan_data == 'terlama') {
+    $sql .= " ORDER BY id_forum ASC";
+} else {
+    $sql .= " ORDER BY id_forum ASC";
+}
+
+// Eksekusi query
+$ambilAspirasi = mysqli_query($koneksi, $sql);
+
+function selamatkanWaktu()
+{
+    date_default_timezone_set('Asia/Jakarta');
+    $jam = date("G"); // 0-23
+
+    if ($jam >= 0 && $jam < 12) {
+        return "Selamat pagi";
+    } elseif ($jam >= 12 && $jam < 15) {
+        return "Selamat siang";
+    } elseif ($jam >= 15 && $jam < 18) {
+        return "Selamat sore";
+    } else {
+        return "Selamat malam";
+    }
+}
+
+// Memanggil fungsi dan menampilkan hasilnya
+$sapaan = selamatkanWaktu();
+
+// Ambil username dari session untuk ditampilkan
+$username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Unknown';
+?>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Biyouth - Admin Dashboard</title>
+    <title>Aspirasi - Admin Dashboard</title>
 
     <!-- Flowbite CSS -->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
@@ -52,7 +176,7 @@
             <hr class="borer border-[var(--txt-primary)]/30 mx-2 my-8">
             <ul class="space-y-3 font-medium">
                 <li>
-                    <a href="../dashboard.html"
+                    <a href="../dashboard.php"
                         class="flex items-center px-4 py-2.5 text-[var(--txt-primary)] rounded-xl hover:bg-[var(--bg-secondary3)]/10 group">
                         <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -87,7 +211,7 @@
                     </button>
                     <ul id="dropdown-example" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="../kelola-konten/tentang.html"
+                            <a href="../kelola-konten/tentang.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -102,7 +226,7 @@
                         </li>
 
                         <li>
-                            <a href="../kelola-konten/program.html"
+                            <a href="../kelola-konten/program.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -116,7 +240,7 @@
                         </li>
 
                         <li>
-                            <a href="../kelola-konten/divisi.html"
+                            <a href="../kelola-konten/divisi.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group bg-transparent hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
@@ -131,7 +255,7 @@
                         </li>
 
                         <li>
-                            <a href="../kelola-konten/news.html"
+                            <a href="../kelola-konten/news.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -147,7 +271,7 @@
                         </li>
 
                         <li>
-                            <a href="../kelola-konten/galeri.html"
+                            <a href="../kelola-konten/galeri.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -169,28 +293,26 @@
                     <button type="button"
                         class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group hover:bg-[var(--bg-secondary3)]/10 mt-2"
                         aria-controls="dropdownPortalLomba" data-collapse-toggle="dropdownPortalLomba">
-                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                            fill="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                             <path
                                 d="M9 6c0-1.65685 1.3431-3 3-3s3 1.34315 3 3-1.3431 3-3 3-3-1.34315-3-3Zm2 3.62992c-.1263-.04413-.25-.08799-.3721-.13131-1.33928-.47482-2.49256-.88372-4.77995-.8482C4.84875 8.66593 4 9.46413 4 10.5v7.2884c0 1.0878.91948 1.8747 1.92888 1.8616 1.283-.0168 2.04625.1322 2.79671.3587.29285.0883.57733.1863.90372.2987l.00249.0008c.11983.0413.24534.0845.379.1299.2989.1015.6242.2088.9892.3185V9.62992Zm2-.00374V20.7551c.5531-.1678 1.0379-.3374 1.4545-.4832.2956-.1034.5575-.1951.7846-.2653.7257-.2245 1.4655-.3734 2.7479-.3566.5019.0065.9806-.1791 1.3407-.4788.3618-.3011.6723-.781.6723-1.3828V10.5c0-.58114-.2923-1.05022-.6377-1.3503-.3441-.29904-.8047-.49168-1.2944-.49929-2.2667-.0352-3.386.36906-4.6847.83812-.1256.04539-.253.09138-.3832.13765Z" />
                         </svg>
 
                         <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Portal Lomba</span>
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 10 6">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="m1 1 4 4 4-4" />
                         </svg>
                     </button>
                     <ul id="dropdownPortalLomba" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="#"
+                            <a href="../portal-lomba/main-content.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    fill="currentColor" viewBox="0 0 24 24">
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path
                                         d="M3 4.92857C3 3.90506 3.80497 3 4.88889 3H19.1111C20.195 3 21 3.90506 21 4.92857V13h-3v-2c0-.5523-.4477-1-1-1h-4c-.5523 0-1 .4477-1 1v2H3V4.92857ZM3 15v1.0714C3 17.0949 3.80497 18 4.88889 18h3.47608L7.2318 19.3598c-.35356.4243-.29624 1.0548.12804 1.4084.42428.3536 1.05484.2962 1.40841-.128L10.9684 18h2.0632l2.2002 2.6402c.3535.4242.9841.4816 1.4084.128.4242-.3536.4816-.9841.128-1.4084L15.635 18h3.4761C20.195 18 21 17.0949 21 16.0714V15H3Z" />
                                     <path d="M16 12v1h-2v-1h2Z" />
@@ -200,25 +322,24 @@
                         </li>
 
                         <li>
-                            <a href="#"
+                            <a href="../portal-lomba/data-peserta.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    fill="currentColor" viewBox="0 0 24 24">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-person-lines-fill w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                                    viewBox="0 0 16 16">
                                     <path
-                                        d="M10.83 5a3.001 3.001 0 0 0-5.66 0H4a1 1 0 1 0 0 2h1.17a3.001 3.001 0 0 0 5.66 0H20a1 1 0 1 0 0-2h-9.17ZM4 11h9.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-1.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2Zm1.17 6H4a1 1 0 1 0 0 2h1.17a3.001 3.001 0 0 0 5.66 0H20a1 1 0 1 0 0-2h-9.17a3.001 3.001 0 0 0-5.66 0Z" />
+                                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z" />
                                 </svg>
 
-                                <span class="ms-3">S&K</span></a>
+                                <span class="ms-3">Data Peserta</span></a>
                         </li>
 
                         <li>
-                            <a href="#"
+                            <a href="../portal-lomba/atur-form.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    viewBox="0 0 24 24">
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd"
                                         d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
                                         clip-rule="evenodd" />
@@ -254,10 +375,10 @@
                     </button>
                     <ul id="dropdownInteraksi" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="biyouth.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group bg-[var(--bg-secondary3)]/20 hover:bg-[var(--bg-secondary3)]/10">
+                            <a href="biyouth.php"
+                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 text-[var(--txt-primary)] group-hover:text-[var(--txt-primary)]"
+                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                                     viewBox="0 0 24 24">
                                     <path fill-rule="evenodd"
@@ -269,10 +390,10 @@
                         </li>
 
                         <li>
-                            <a href="aspirasi.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
+                            <a href="aspirasi.php"
+                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group bg-[var(--bg-secondary3)]/20 hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                                <svg class="w-5 h-5 text-[var(--txt-primary)] group-hover:text-[var(--txt-primary)]"
                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     fill="currentColor" viewBox="0 0 24 24">
                                     <path
@@ -282,45 +403,53 @@
                                 </svg>
                                 <span class="ms-3">Aspirasi</span></a>
                         </li>
-
-                        <li>
-                            <a href="atur-form.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd"
-                                        d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
-                                        clip-rule="evenodd" />
-                                    <path fill-rule="evenodd"
-                                        d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span class="ms-3">Atur Form</span>
-                            </a>
-                        </li>
                     </ul>
                 </li>
 
                 <hr class="border-b border-[var(--txt-primary)]/20 mx-2 my-6">
 
                 <li>
-                    <a href="#"
-                        class="flex items-center px-4 py-2.5 text-[var(--txt-primary)] rounded-xl hover:bg-[var(--bg-secondary3)]/10 group">
+                    <button data-modal-target="modalLogout" data-modal-toggle="modalLogout"
+                        class="flex items-center px-4 py-2.5 text-[var(--txt-primary)] rounded-xl hover:bg-[var(--bg-secondary3)]/10 group w-full cursor-pointer">
                         <svg class="w-5 h-5 text-[var(--txt-primary)]/50 transition duration-75 group-hover:text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2" />
                         </svg>
                         <span class="ms-3">Logout</span>
-                    </a>
+                    </button>
                 </li>
 
             </ul>
         </div>
     </aside>
     <!-- Tutup Sidebar -->
+
+    <!-- Modal Logout -->
+    <div id="modalLogout" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-[var(--bg-primary)] rounded-lg shadow-sm">
+                <button type="button" class="absolute top-3 end-2.5 text-[var(--txt-primary)]/50 bg-transparent hover:bg-[var(--txt-primary)]/30 hover:text-[var(--txt-primary)]/80 rounded-xl text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer" data-modal-hide="modalLogout">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+                <div class="p-4 md:p-5 text-center">
+                    <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <h3 class="mb-5 text-lg font-normal text-[var(--txt-primary)]/60">
+                        Yakin ingin Logout?
+                    </h3>
+                    <button data-modal-hide="modalLogout" type="button" class="cursor-pointer py-2.5 px-5 text-sm font-medium text-[var(--txt-primary)] focus:outline-none bg-[var(--bg-secondary3)]/0 rounded-lg border border-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/10 hover:text-[var(--txt-primary)] focus:z-10 ">Cancel</button>
+                    <a type="button" href="../logout.php" data-modal-hide="modalLogout" type="button" class="ms-2 text-[var(--txt-primary2)] bg-[var(--bg-secondary3)]/80 hover:bg-[var(--bg-secondary3)] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content Dashboard -->
     <div class="px-4 md:px-4 lg:px-8 sm:ml-64">
@@ -332,7 +461,8 @@
             </div>
             <div class="flex items-center justify-end h-10 md:h-20">
                 <h1 class="text-end text-md md:text-lg lg:text-xl font-light text-[var(--txt-primary2)]/80">
-                    Selamat Pagi, Admin!
+                    <?php echo $sapaan; ?>,
+                    <?php echo $username; ?>!
                 </h1>
             </div>
         </div>
@@ -341,31 +471,34 @@
 
         <div class="flex flex-col gap-6">
             <h1 class="text-md md:text-lg lg:text-xl xl:text-2xl font-semibold text-[var(--txt-primary2)] text-start">
-                Biyouth Creation
+                Aspirasi
             </h1>
+            <?php echo $alert_message; ?>
             <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 sm:gap-10 rounded-2xl">
                 <form class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     <div class="max-w-2xl">
-                        <select id="countries"
+                        <select id="tujuan" name="tujuan_aspirasi" onchange="this.form.submit()"
                             class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-bg-primary focus:border-bg-primary block w-full px-4 cursor-pointer hover:bg-[var(--bg-primary)]/10 transition duration-300">
-                            <option selected>
-                                Semua Divisi
-                            </option>
-                            <option value="belaNegara">Bela Negara</option>
-                            <option value="Ketaqwaan">Ketaqwaan</option>
-                            <option value="budiPekerti">Budi Pekerti</option>
-                            <option value="Kesehatan">Kesehatan</option>
-                            <option value="Seniora">Seniora</option>
+                            <option value="">Semua Tujuan</option>
+                            <option value="OSIS Divisi Bela Negara" <?= ($tujuan_aspirasi == 'OSIS Divisi Bela Negara') ? 'selected' : '' ?>>OSIS Divisi Bela Negara</option>
+                            <option value="OSIS Divisi BPH (Badan Pengurus Harian)" <?= ($tujuan_aspirasi == 'OSIS Divisi BPH (Badan Pengurus Harian)') ? 'selected' : '' ?>>OSIS Divisi BPH (Badan Pengurus Harian)</option>
+                            <option value="OSIS Divisi Budi Pekerti" <?= ($tujuan_aspirasi == 'OSIS Divisi Budi Pekerti') ? 'selected' : '' ?>>OSIS Divisi Budi Pekerti</option>
+                            <option value="OSIS Divisi Kesehatan" <?= ($tujuan_aspirasi == 'OSIS Divisi Kesehatan') ? 'selected' : '' ?>>OSIS Divisi Kesehatan</option>
+                            <option value="OSIS Divisi Ketaqwaan" <?= ($tujuan_aspirasi == 'OSIS Divisi Ketaqwaan') ? 'selected' : '' ?>>OSIS Divisi Ketaqwaan</option>
+                            <option value="OSIS Divisi Seniora (Seni dan Olahraga)" <?= ($tujuan_aspirasi == 'OSIS Divisi Seniora (Seni dan Olahraga)') ? 'selected' : '' ?>>OSIS Divisi Seniora (Seni dan Olahraga)</option>
+                            <option value="OSIS Divisi TIK (Teknologi Informasi dan Komunikasi)" <?= ($tujuan_aspirasi == 'OSIS Divisi TIK (Teknologi Informasi dan Komunikasi)') ? 'selected' : '' ?>>OSIS Divisi TIK (Teknologi Informasi dan Komunikasi)</option>
+                            <option value="Pihak Sekolah" <?= ($tujuan_aspirasi == 'Pihak Sekolah') ? 'selected' : '' ?>>Pihak Sekolah</option>
+                            <option value="Seluruh OSIS" <?= ($tujuan_aspirasi == 'Seluruh OSIS') ? 'selected' : '' ?>>Seluruh OSIS</option>
                         </select>
                     </div>
                     <div class="max-w-2xl">
-                        <select id="countries"
+                        <select id="urutkan_data" name="urutkan_data" onchange="this.form.submit()"
                             class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-bg-primary focus:border-bg-primary block w-full px-4 cursor-pointer hover:bg-[var(--bg-primary)]/10 transition duration-300">
-                            <option selected>
-                                Semua Waktu
+                            <option value="">
+                                Urutkan
                             </option>
-                            <option value="US">Terakhir</option>
-                            <option value="CA">Terbaru</option>
+                            <option value="terbaru" <?= ($urutkan_data == ' terbaru') ? 'selected' : '' ?>>Terbaru</option>
+                            <option value="terlama" <?= ($urutkan_data == 'terlama') ? 'selected' : '' ?>>Terlama</option>
                         </select>
                     </div>
                     <div class="max-w-2xl flex items-center">
@@ -387,10 +520,10 @@
                     </div>
                 </form>
                 <div class="flex flex-col items-end justify-center">
-                    <button type="button"
+                    <a href="../crud/tambah-aspirasi.php"
                         class="focus:outline-none text-[var(--txt-primary)] bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-2xl text-md px-5 py-2.5 shadow-lg hover:shadow-none transition duration-300 cursor-pointer">
                         Tambah
-                    </button>
+                    </a>
                 </div>
             </div>
             <div class="flex items-center justify-center mt-4">
@@ -404,10 +537,10 @@
                                     ID
                                 </th>
                                 <th scope="col" class="px-6 py-3">
-                                    Nama Divisi
+                                    Tujuan Aspirasi
                                 </th>
                                 <th scope="col" class="px-6 py-3">
-                                    Gambar
+                                    Komentar
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-end">
                                     Aksi
@@ -415,28 +548,75 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                class="bg-transparent border-b border-[var(--bg-primary)]/20 hover:bg-[var(--bg-primary)]/10">
-                                <th scope="row"
-                                    class="px-6 py-4 font-medium text-[var(--txt-primary2)] whitespace-nowrap">
-                                    1
-                                </th>
-                                <td class="px-6 py-4">
-                                    Divisi Lorem Ipsum
-                                </td>
-                                <td class="px-6 py-4">
-                                    <img src="../../assets/img/admin-asset/program/img-dummy-program.png"
-                                        alt="Dummy Img">
-                                </td>
-                                <td class="px-6 py-4 text-right space-y-2">
-                                    <a href="#" class="font-medium text-md sm:text-lg text-yellow-600 hover:underline">
-                                        UBAH
-                                    </a>
-                                    <a href="#" class="font-medium text-md lg:text-lg text-red-600 hover:underline">
-                                        HAPUS
-                                    </a>
-                                </td>
-                            </tr>
+
+                            <?php
+                            if ($ambilAspirasi && mysqli_num_rows($ambilAspirasi) > 0) {
+                                while ($tampilAspirasi = mysqli_fetch_array($ambilAspirasi)) {
+                            ?>
+
+                                    <tr
+                                        class="bg-transparent border-b border-[var(--bg-primary)]/20 hover:bg-[var(--bg-primary)]/10">
+                                        <th scope="row"
+                                            class="px-6 py-4 font-medium text-[var(--txt-primary2)] whitespace-nowrap">
+                                            <?= htmlspecialchars($tampilAspirasi['id_forum']); ?>
+                                        </th>
+                                        <td class="px-6 py-4">
+                                            <?= htmlspecialchars($tampilAspirasi['tujuan_aspirasi']); ?>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <?= htmlspecialchars($tampilAspirasi['komentar_forum']); ?>
+                                        </td>
+                                        <td class="px-6 py-4 text-right space-y-2">
+                                            <a href="../crud/ubah-aspirasi.php?kode=<?= $tampilAspirasi['id_forum']; ?>" class="font-medium text-md sm:text-lg text-yellow-600 hover:underline">
+                                                UBAH
+                                            </a>
+                                            <button data-modal-target="modalHapusAspirasi<?= $tampilAspirasi['id_forum']; ?>" data-modal-toggle="modalHapusAspirasi<?= $tampilAspirasi['id_forum']; ?>" class="font-medium text-md lg:text-lg text-red-600 hover:underline">
+                                                HAPUS
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Modal Data - Delete -->
+                                    <div id="modalHapusAspirasi<?= $tampilAspirasi['id_forum']; ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                                        <div class="relative p-4 w-full max-w-md max-h-full">
+                                            <div class="relative bg-[var(--bg-primary)] rounded-lg shadow-sm">
+                                                <button type="button" class="absolute top-3 end-2.5 text-[var(--txt-primary)]/50 bg-transparent hover:bg-[var(--txt-primary)]/30 hover:text-[var(--txt-primary)]/80 rounded-xl text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer" data-modal-hide="modalHapusAspirasi<?= $tampilAspirasi['id_forum']; ?>">
+                                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                                    </svg>
+                                                    <span class="sr-only">Close modal</span>
+                                                </button>
+                                                <div class="p-4 md:p-5 text-center">
+                                                    <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+                                                    <h3 class="mb-5 text-lg font-normal text-[var(--txt-primary)]/60">
+                                                        Yakin ingin menghapus data ini?
+                                                    </h3>
+                                                    <button data-modal-hide="modalHapusAspirasi<?= $tampilAspirasi['id_forum']; ?>" type="button" class="cursor-pointer py-2.5 px-5 text-sm font-medium text-[var(--txt-primary)] focus:outline-none bg-[var(--bg-secondary3)]/0 rounded-lg border border-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/10 hover:text-[var(--txt-primary)] focus:z-10 ">
+                                                        Cancel
+                                                    </button>
+                                                    <a href="?kode=<?= $tampilAspirasi['id_forum']; ?>" class="ms-2 text-[var(--txt-primary)] bg-[var(--text-danger)]/80 hover:bg-[var(--text-danger)] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">
+                                                        Hapus
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                <?php
+                                }
+                            } else {
+                                ?>
+                                <tr>
+                                    <td class="px-6 py-8 text-center" colspan="7">
+                                        Tidak ada data yang cocok dengan filter/pencarian/data tidak tersedia.
+                                    </td>
+                                </tr>
+                            <?php
+                            }
+                            ?>
+
                         </tbody>
                     </table>
                 </div>
@@ -474,7 +654,6 @@
                 });
             });
         });
-
     </script>
 
 

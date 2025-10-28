@@ -1,4 +1,49 @@
-<!DOCTYPE html>
+<?php
+
+// PHP Connection Include
+include "koneksi.php";
+
+// Select Data -> Tentang Kami
+$ambilTentang = mysqli_query($koneksi, "SELECT * FROM tb_about");
+
+// Select Data -> Program Mendatang
+$ambilProgram = mysqli_query($koneksi, "SELECT * FROM tb_promdat");
+
+// Select Data -> Divisi
+$ambilDivisi = mysqli_query($koneksi, "SELECT * FROM tb_divisi");
+
+// Select Data -> News
+$ambilNews = mysqli_query($koneksi, "SELECT * FROM tb_news");
+// Select Data -> Galeri
+// Galeri Landscape
+$galeriLandscape = mysqli_query($koneksi, "SELECT * FROM tb_galeri WHERE kategori_galeri = 'landscape'");
+
+// Galeri Kotak
+$galeriKotak = mysqli_query($koneksi, "SELECT * FROM tb_galeri WHERE kategori_galeri = 'kotak'");
+
+// Select Data - Biyouth
+$ambilBiyouth = mysqli_query($koneksi, "SELECT * FROM tb_biyouth");
+
+// Kirim Data
+if (isset($_POST['kirim'])) {
+
+  // Ambil dan amankan input
+  $tujuan_aspirasi = mysqli_real_escape_string($koneksi, $_POST['tujuan_aspirasi']);
+  $komentar_forum = mysqli_real_escape_string($koneksi, $_POST['komentar_forum']);
+
+  mysqli_query($koneksi, "INSERT INTO tb_forum_aspirasi SET
+      tujuan_aspirasi = '$tujuan_aspirasi',
+      komentar_forum = '$komentar_forum'
+  ");
+
+  echo "<script>
+    alert('Terima kasih sudah berkomentar ya! Kami telah menerima komentar kamu! 😁👍');
+    window.location.href = 'index.php#forum-aspirasi';
+  </script>";
+  exit;
+}
+
+?>
 <html lang="en">
 
 <head>
@@ -104,29 +149,35 @@
 
   <section id="about-us" class="bg-[var(--bg-secondary2)] text-[var(--txt-primary2)]">
     <div class="container mx-auto py-14 md:py-24 px-6">
-      <div class="flex flex-col w-full bg-[var(--bg-secondary3)] p-4 md:p-6 rounded-2xl md:rounded-3xl">
-        <h1 class="font-bold text-xl md:text-2xl lg:text-4xl text-center md:text-start ms-0 md:ms-5">
-          TENTANG KAMI
-        </h1>
-      </div>
 
-      <div
-        class="grid grid-cols-1 xl:grid-cols-2 mt-6 md:mt-10 w-full bg-[var(--bg-secondary3)] p-6 md:p-14 rounded-2xl md:rounded-3xl gap-8 xl:gap-20">
-        <div class="flex flex-col">
-          <img src="assets/img/img-about.png" alt="Image About Us" />
-          <p class="text-xl lg:text-2xl font-bold mt-4">
-            — Kerja Cerdas, Kerja Ikhlas
+      <?php
+      while ($tampilTentang = mysqli_fetch_array($ambilTentang)) {
+      ?>
+
+        <div class="flex flex-col w-full bg-[var(--bg-secondary3)] p-4 md:p-6 rounded-2xl md:rounded-3xl">
+          <h1 class="font-bold text-xl md:text-2xl lg:text-4xl text-center md:text-start ms-0 md:ms-5">
+            <?= $tampilTentang['head_about']; ?>
+          </h1>
+        </div>
+
+        <div
+          class="grid grid-cols-1 xl:grid-cols-2 mt-6 md:mt-10 w-full bg-[var(--bg-secondary3)] p-6 md:p-14 rounded-2xl md:rounded-3xl gap-8 xl:gap-20">
+          <div class="flex flex-col">
+            <img src="assets/img/<?= $tampilTentang['img_about']; ?>" alt="Image About Us" />
+            <p class="text-xl lg:text-2xl font-bold mt-4">
+              <?= $tampilTentang['hashtag_about']; ?>
+            </p>
+          </div>
+
+          <p class="text-md lg:text-2xl xl:text-3xl 2xl:text-[34px] font-light leading-relaxed text-justify">
+            <?= $tampilTentang['deskripsi_about']; ?>
           </p>
         </div>
 
-        <p class="text-md lg:text-2xl xl:text-3xl 2xl:text-[34px] font-light leading-relaxed text-justify">
-          OSIS (Organisasi Siswa Intra Sekolah) SMK Bina Informatika adalah
-          wadah bagi peserta didik untuk berkembang, berkreasi, dan
-          berkontribusi dalam membangun sekolah yang lebih baik dan
-          berprestasi. Kami hadir sebagai jembatan aspirasi, penggerak
-          inovasi, dan pelopor kegiatan positif bagi seluruh siswa.
-        </p>
-      </div>
+      <?php
+      }
+      ?>
+
     </div>
   </section>
 
@@ -148,50 +199,35 @@
       </p>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-10 md:gap-20 mt-10 md:mt-20">
-        <div
-          class="flex flex-col item-center justify-center p-4 md:p-8 rounded-2xl md:rounded-4xl bg-[var(--bg-secondary3)] shadow-lg hover:bg-[var(--bg-secondary3)]/60 hover:cursor-pointer border-2 border-[var(--txt-primary)] transition duration-300 hover:shadow-none">
-          <img src="assets/img/promdat/promdat-1.png" alt="Program Mendatang 1" class="mb-4 rounded-2xl" />
-          <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-start">
-            Sumatif Tengah Semester
-          </h1>
-          <p class="text-sm sm:text-md md:text-lg">
-            - 10 Maret 2025 s/d 18 Maret 2025
-          </p>
-          <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
-          <p class="text-md md:text-xl text-justify">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-            enim ad minim veniam, quis nostrud.
-          </p>
-        </div>
-        <div
-          class="flex flex-col item-center justify-center p-4 md:p-8 rounded-2xl md:rounded-4xl bg-[var(--bg-secondary3)] shadow-lg hover:bg-[var(--bg-secondary3)]/60 hover:cursor-pointer border-2 border-[var(--txt-primary)] transition duration-300 hover:shadow-none">
-          <img src="assets/img/promdat/promdat-2.png" alt="Program Mendatang 2" class="mb-4 rounded-2xl" />
-          <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-start">
-            Pesantren Ramadhan
-          </h1>
-          <p class="text-sm sm:text-md md:text-lg">- 19, 20, 21 Maret 2025</p>
-          <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
-          <p class="text-md md:text-xl text-justify">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-            enim ad minim veniam, quis nostrud.
-          </p>
-        </div>
-        <div
-          class="flex flex-col item-center justify-center p-4 md:p-8 rounded-2xl md:rounded-4xl bg-[var(--bg-secondary3)] shadow-lg hover:bg-[var(--bg-secondary3)]/60 hover:cursor-pointer border-2 border-[var(--txt-primary)] transition duration-300 hover:shadow-none">
-          <img src="assets/img/promdat/promdat-3.png" alt="Program Mendatang 3" class="mb-4 rounded-2xl" />
-          <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-start">
-            BI's Got Talent
-          </h1>
-          <p class="text-sm sm:text-md md:text-lg">- 17 & 19 April 2025</p>
-          <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
-          <p class="text-md md:text-xl text-justify">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-            enim ad minim veniam, quis nostrud.
-          </p>
-        </div>
+
+        <!-- Perulangan Logic Promdat -->
+        <?php
+
+        while ($tampilPromdat = mysqli_fetch_array($ambilProgram)) {
+
+        ?>
+
+          <div
+            class="flex flex-col item-center justify-center p-4 md:p-8 rounded-2xl md:rounded-4xl bg-[var(--bg-secondary3)] shadow-lg hover:bg-[var(--bg-secondary3)]/60 hover:cursor-pointer border-2 border-[var(--txt-primary)] transition duration-300 hover:shadow-none">
+            <img src="assets/img/promdat/<?= $tampilPromdat['img_card']; ?>" alt="Program Mendatang 1" class="mb-4 rounded-2xl" />
+            <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-start">
+              <?= $tampilPromdat['judul_card']; ?>
+            </h1>
+            <p class="text-sm sm:text-md md:text-lg">
+              <?= $tampilPromdat['tanggal_card']; ?>
+            </p>
+            <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
+            <p class="text-md md:text-xl text-justify">
+              <?= $tampilPromdat['deskripsi_card']; ?>
+            </p>
+          </div>
+
+        <?php
+
+        }
+
+        ?>
+
       </div>
     </div>
   </section>
@@ -213,41 +249,28 @@
 
       <div
         class="grid lg:flex flex-wrap justify-center grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-20 mt-12 md:mt-20">
-        <div class="flex flex-col gap-2 md:gap-4 items-center hover:cursor-pointer">
-          <img src="assets/img/divisi/bph-logo.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
-          <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl"> BPH </span>
-        </div>
-        <div class="flex flex-col gap-2 items-center hover:cursor-pointer">
-          <img src="assets/img/divisi/belneg-logo.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
-          <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl"> BELA NEGARA </span>
-        </div>
-        <div class="flex flex-col gap-2 items-center hover:cursor-pointer">
-          <img src="assets/img/divisi/ketaqwaan-logo.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
-          <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl"> KETAQWAAN </span>
-        </div>
-        <div class="flex flex-col gap-2 items-center hover:cursor-pointer">
-          <img src="assets/img/divisi/budpek-logo.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
-          <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl"> BUDI PEKERTI </span>
-        </div>
-        <div class="flex flex-col gap-2 items-center hover:cursor-pointer">
-          <img src="assets/img/divisi/kesehatan-logo.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
-          <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl"> KESEHATAN </span>
-        </div>
-        <div class="flex flex-col gap-2 items-center hover:cursor-pointer">
-          <img src="assets/img/divisi/seniora-logo.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
-          <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl"> SENIORA </span>
-        </div>
-        <div class="flex flex-col gap-2 items-center hover:cursor-pointer">
-          <img src="assets/img/divisi/tik-logo.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
-          <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl"> TIK </span>
-        </div>
+
+        <!-- Perulangan Logic - Divisi -->
+        <?php
+
+        while ($tampilDivisi = mysqli_fetch_array($ambilDivisi)) {
+
+        ?>
+
+          <div class="flex flex-col gap-2 md:gap-4 items-center hover:cursor-pointer">
+            <img src="assets/img/divisi/<?= $tampilDivisi['img_divisi'] ?>" alt="Divisi"
+              class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
+            <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl">
+              <?= $tampilDivisi['tagline_divisi']; ?>
+            </span>
+          </div>
+
+        <?php
+
+        }
+
+        ?>
+
       </div>
     </div>
   </section>
@@ -273,45 +296,25 @@
       <div id="default-carousel" class="relative w-full" data-carousel="slide">
         <!-- Carousel wrapper -->
         <div class="relative h-56 sm:h-72 md:h-96 lg:h-[32rem] xl:h-screen overflow-hidden rounded-lg">
-          <!-- Item 1 -->
-          <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <img src="assets/img/news/news-1.png"
-              class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
-          </div>
-          <!-- Item 2 -->
-          <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <img src="assets/img/news/news-1.png"
-              class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
-          </div>
-          <!-- Item 3 -->
-          <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <img src="assets/img/news/news-1.png"
-              class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
-          </div>
-          <!-- Item 4 -->
-          <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <img src="assets/img/news/news-1.png"
-              class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
-          </div>
-          <!-- Item 5 -->
-          <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <img src="assets/img/news/news-1.png"
-              class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
-          </div>
-        </div>
-        <!-- Slider indicators -->
-        <div
-          class="absolute z-30 flex -translate-x-1/2 -bottom-5 md:-bottom-10 xl:bottom-20 left-1/2 space-x-3 rtl:space-x-reverse">
-          <button type="button" class="w-2 h-2 sm:w-3 sm:h-3 rounded-full" aria-current="true" aria-label="Slide 1"
-            data-carousel-slide-to="0"></button>
-          <button type="button" class="w-2 h-2 sm:w-3 sm:h-3 rounded-full" aria-current="false" aria-label="Slide 2"
-            data-carousel-slide-to="1"></button>
-          <button type="button" class="w-2 h-2 sm:w-3 sm:h-3 rounded-full" aria-current="false" aria-label="Slide 3"
-            data-carousel-slide-to="2"></button>
-          <button type="button" class="w-2 h-2 sm:w-3 sm:h-3 rounded-full" aria-current="false" aria-label="Slide 4"
-            data-carousel-slide-to="3"></button>
-          <button type="button" class="w-2 h-2 sm:w-3 sm:h-3 rounded-full" aria-current="false" aria-label="Slide 5"
-            data-carousel-slide-to="4"></button>
+
+          <!-- Logic Loop News -->
+          <?php
+
+          while ($tampilNews = mysqli_fetch_array($ambilNews)) {
+
+          ?>
+
+            <div class="hidden duration-700 ease-in-out" data-carousel-item>
+              <img src="assets/img/news/<?= $tampilNews['gambar'] ?>"
+                class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
+            </div>
+
+          <?php
+
+          }
+
+          ?>
+
         </div>
         <!-- Slider controls -->
         <button type="button"
@@ -361,40 +364,38 @@
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12 mt-12">
-        <img src="assets/img/galeri/galeri-landscape1.png"
-          class="p-3 sm:p-4 md:p-4 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-          alt="Galeri Landscape 1">
-        <img src="assets/img/galeri/galeri-landscape1.png"
-          class="p-3 sm:p-4 md:p-4 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-          alt="Galeri Landscape 1">
+
+        <!-- Galeri Landscape Logic Loop -->
+        <?php
+        while ($tampilLandscape = mysqli_fetch_array($galeriLandscape)) {
+        ?>
+
+          <img src="assets/img/galeri/<?= $tampilLandscape['img_galeri']; ?>"
+            class="p-3 sm:p-4 md:p-4 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
+            alt="Galeri Landscape 1">
+
+        <?php
+        }
+        ?>
+
       </div>
 
       <div
         class="grid grid-cols-2 [350px]:grid-cols-2 [351px]:grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 md:gap-20 lg:gap-8 mt-6 md:mt-10 justify-center">
-        <img src="assets/img/galeri/galeri1.png"
-          class="p-2 sm:p-4 md:p-6 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-3xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-          alt="Galeri">
-        <img src="assets/img/galeri/galeri2.png"
-          class="p-2 sm:p-4 md:p-6 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-3xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-          alt="Galeri">
-        <img src="assets/img/galeri/galeri3.png"
-          class="p-2 sm:p-4 md:p-6 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-3xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-          alt="Galeri">
-        <img src="assets/img/galeri/galeri4.png"
-          class="p-2 sm:p-4 md:p-6 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-3xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-          alt="Galeri">
-        <img src="assets/img/galeri/galeri5.png"
-          class="p-2 sm:p-4 md:p-6 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-3xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-          alt="Galeri">
-        <img src="assets/img/galeri/galeri6.png"
-          class="p-2 sm:p-4 md:p-6 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-3xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-          alt="Galeri">
-        <img src="assets/img/galeri/galeri7.png"
-          class="p-2 sm:p-4 md:p-6 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-3xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-          alt="Galeri">
-        <img src="assets/img/galeri/galeri8.png"
-          class="p-2 sm:p-4 md:p-6 lg¬ø:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-3xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer"
-          alt="Galeri">
+
+        <!-- Galeri Kotak Logic Loop -->
+        <?php
+        while ($tampilKotak = mysqli_fetch_array($galeriKotak)) {
+        ?>
+
+          <img src="assets/img/galeri/<?= $tampilKotak['img_galeri']; ?>"
+            class="p-2 sm:p-4 md:p-6 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-3xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
+            alt="Galeri">
+
+        <?php
+        }
+        ?>
+
       </div>
     </div>
   </section>
@@ -421,33 +422,34 @@
 
       <h1 class="font-bold text-[var(--txt-primary2)] text-lg md:text-xl lg:text-3xl mt-8 md:mt-12">Ditujukan ke...</h1>
 
-      <form class="w-full mx-auto">
+      <form class="w-full mx-auto" action="" method="POST">
         <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         </label>
-        <select id="tujuanForumAspirasi"
+        <select id="tujuanForumAspirasi" name="tujuan_aspirasi"
           class="bg-[var(--bg-secondary)] border border-[var(--bg-primary)] text-gray-900 text-md md:text-lg rounded-2xl md:rounded-3xl block w-full  px-6 md:px-8 py-2 md:py-4 mt-4 hover:cursor-pointer hover:bg-[var(--bg-secondary)]/60 transition duration-500">
-          <option selected></option>
-          <option value="US">Pihak Sekolah</option>
-          <option value="CA">Seluruh OSIS</option>
-          <option value="FR">OSIS Divisi BPH (Badan Pengurus Harian)</option>
-          <option value="DE">OSIS Divisi Bela Negara</option>
-          <option value="DE">OSIS Divisi Budi Pekerti</option>
-          <option value="DE">OSIS Divisi Kesehatan</option>
-          <option value="DE">OSIS Divisi Ketaqwaan</option>
-          <option value="DE">OSIS Divisi Seniora (Seni dan Olahraga)</option>
-          <option value="DE">OSIS Divisi TIK (Teknologi Informasi dan Komunikasi)</option>
+          <option value="">Semua Tujuan</option>
+          <option value="OSIS Divisi Bela Negara">OSIS Divisi Bela Negara</option>
+          <option value="OSIS Divisi BPH (Badan Pengurus Harian)">OSIS Divisi BPH (Badan Pengurus Harian)</option>
+          <option value="OSIS Divisi Budi Pekerti">OSIS Divisi Budi Pekerti</option>
+          <option value="OSIS Divisi Kesehatan">OSIS Divisi Kesehatan</option>
+          <option value="OSIS Divisi Ketaqwaan">OSIS Divisi Ketaqwaan</option>
+          <option value="OSIS Divisi Seniora (Seni dan Olahraga)">OSIS Divisi Seniora (Seni dan Olahraga)</option>
+          <option value="OSIS Divisi TIK (Teknologi Informasi dan Komunikasi)">OSIS Divisi TIK (Teknologi Informasi dan Komunikasi)</option>
+          <option value="Pihak Sekolah">Pihak Sekolah</option>
+          <option value="Seluruh OSIS">Seluruh OSIS</option>
+
         </select>
 
         <div class="mt-8 md:mt-12">
           <label for="message" class="block mb-4 font-bold text-[var((--txt-primary2))] text-lg md:text-xl lg:text-3xl">
             Aspirasi / Saran / Kritik (max. 300 words)
           </label>
-          <textarea id="message" rows="4"
+          <textarea id="message" rows="4" name="komentar_forum"
             class="block p-3 md:p-4 w-full text-md md:text-xl text-[var(--txt-primary2)] bg-white rounded-2xl md:rounded-3xl border border-[var(--bg-primary)]/50 focus:ring-[var(--bg-primary)]/20 focus:border-[var(--bg-primary)]"
             placeholder="Berikan aspirasi, saran, atau kritikmu di kolom ini. Pastikan menggunakan bahasa yang sopan, ya!"></textarea>
         </div>
 
-        <button type="submit"
+        <button type="submit" name="kirim"
           class="text-[var(--txt-primary)] bg-[var(--bg-secondary2)] hover:bg-[var(--bg-secondary2)]/90 focus:ring-3 focus:outline-none focus:ring-[var(--bg-secondary)] font-bold rounded-xl text-md md:text-lg w-full px-5 py-2.5 text-center mt-6 cursor-pointer transition duration-500 shadow-md">
           Kirim
         </button>
@@ -473,61 +475,30 @@
 
       <!-- Biyouth - Lomba -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 mt-12">
-        <div class="flex flex-col gap-4 md:gap-6 items-center hover:cursor-pointer">
-          <img src="assets/img/biyouth-creation/bicre-1.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-4 sm:p-6 md:p-8 rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg" />
-          <div
-            class="bg-[var(--bg-secondary3)] p-2 md:p-4 w-full text-center rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/80 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg">
-            <h1 class="font-bold text-base md:text-xl lg:text-2xl text-[var(--txt-primary2)]">
-              Etika di Ruang Guru
-            </h1>
-            <h1 class="font-light italic text-sm md:text-md lg:text-xl text-[var(--txt-primary2)]">
-              Qanita Malila - XII DKV
-            </h1>
-          </div>
-        </div>
 
-        <div class="flex flex-col gap-4 md:gap-6 items-center hover:cursor-pointer">
-          <img src="assets/img/biyouth-creation/bicre-2.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-4 sm:p-6 md:p-8 rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg" />
-          <div
-            class="bg-[var(--bg-secondary3)] p-2 md:p-4 w-full text-center rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/80 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg">
-            <h1 class="font-bold text-base md:text-xl lg:text-2xl text-[var(--txt-primary2)]">
-              Bawalah Bekal Sendiri!
-            </h1>
-            <h1 class="font-light italic text-sm md:text-md lg:text-xl text-[var(--txt-primary2)]">
-              Qanita Malila - XII DKV
-            </h1>
-          </div>
-        </div>
+        <!-- Logic Loop Biyouth -->
+        <?php
+        while ($tampilBiyouth = mysqli_fetch_array($ambilBiyouth)) {
+        ?>
 
-        <div class="flex flex-col gap-4 md:gap-6 items-center hover:cursor-pointer">
-          <img src="assets/img/biyouth-creation/bicre-3.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-4 sm:p-6 md:p-8 rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg" />
-          <div
-            class="bg-[var(--bg-secondary3)] p-2 md:p-4 w-full text-center rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/80 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg">
-            <h1 class="font-bold text-base md:text-xl lg:text-2xl text-[var(--txt-primary2)]">
-              UAS Perpustakaan
-            </h1>
-            <h1 class="font-light italic text-sm md:text-md lg:text-xl text-[var(--txt-primary2)]">
-              Raihan Rizky Adriansyah - XII RPL
-            </h1>
+          <div class="flex flex-col gap-4 md:gap-6 items-center hover:cursor-pointer">
+            <img src="assets/img/biyouth_creation/<?= $tampilBiyouth['gambar_biyouth'] ?>" alt="Divisi"
+              class="w-full bg-[var(--bg-secondary3)] p-4 sm:p-6 md:p-8 rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg" />
+            <div
+              class="bg-[var(--bg-secondary3)] p-2 md:p-4 w-full text-center rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/80 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg">
+              <h1 class="font-bold text-base md:text-xl lg:text-2xl text-[var(--txt-primary2)]">
+                <?= $tampilBiyouth['judul_biyouth']; ?>
+              </h1>
+              <h1 class="font-light italic text-sm md:text-md lg:text-xl text-[var(--txt-primary2)]">
+                <?= $tampilBiyouth['nama_peserta']; ?>
+              </h1>
+            </div>
           </div>
-        </div>
 
-        <div class="flex flex-col gap-4 md:gap-6 items-center hover:cursor-pointer">
-          <img src="assets/img/biyouth-creation/bicre-4.png" alt="Divisi"
-            class="w-full bg-[var(--bg-secondary3)] p-4 sm:p-6 md:p-8 rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg" />
-          <div
-            class="bg-[var(--bg-secondary3)] p-2 md:p-4 w-full text-center rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/80 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg">
-            <h1 class="font-bold text-base md:text-xl lg:text-2xl text-[var(--txt-primary2)]">
-              Website Streaming Anime
-            </h1>
-            <h1 class="font-light italic text-sm md:text-md lg:text-xl text-[var(--txt-primary2)]">
-              M Dafa Adiwinata - XI RPL
-            </h1>
-          </div>
-        </div>
+        <?php
+        }
+        ?>
+
       </div>
     </div>
   </section>
@@ -592,7 +563,7 @@
 
   <!-- Scroll Logic Navbar -->
   <script>
-    window.addEventListener("scroll", function () {
+    window.addEventListener("scroll", function() {
       const navbar = document.querySelector("nav");
 
       if (window.scrollY > 0) {

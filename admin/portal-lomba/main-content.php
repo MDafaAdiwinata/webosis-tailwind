@@ -1,10 +1,145 @@
-<!DOCTYPE html>
+<?php
+
+include "../../koneksi.php";
+session_start();
+if (!isset($_SESSION['username'])) {
+    echo "
+    <script>
+        alert('Silahkan Login Terlebih Dahulu!');
+        window.location.href = '../index.php';
+    </script>
+    ";
+}
+
+// Ambil username dari session untuk ditampilkan
+$username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Unknown';
+
+// Query Ambil Data dari table about
+$sql = "SELECT * FROM tb_main_content";
+$ambilMain = mysqli_query($koneksi, $sql);
+$tampilMain = mysqli_fetch_assoc($ambilMain);
+
+// Menyiapkan variabel untuk pesan alert dari session
+$alert_message = '';
+if (isset($_SESSION['alert_message'])) {
+    $alert_message = $_SESSION['alert_message'];
+    unset($_SESSION['alert_message']); // Hapus pesan dari session agar tidak tampil lagi
+}
+
+// Proses Update Data Main Content
+if (isset($_POST['ubah'])) {
+    $id_content = $_POST['id_content'];
+    $judul_portal = mysqli_real_escape_string($koneksi, $_POST['judul_portal']);
+    $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+    $link_teknis = mysqli_real_escape_string($koneksi, $_POST['link_teknis']);
+    $link_reels = mysqli_real_escape_string($koneksi, $_POST['link_reels']);
+    $link_contact = mysqli_real_escape_string($koneksi, $_POST['link_contact']);
+
+    // Folder untuk menyimpan gambar
+    $folder = '../../assets/img/galeri/';
+
+    // Array untuk menyimpan nama file gambar baru
+    $gambar_fields = ['gambar_1', 'gambar_2', 'gambar_3', 'gambar_4'];
+    $update_gambar = "";
+
+    // Proses setiap gambar
+    foreach ($gambar_fields as $field) {
+        if (!empty($_FILES[$field]['name'])) {
+            $gambar_baru = $_FILES[$field]['name'];
+            $tmp = $_FILES[$field]['tmp_name'];
+            $newName = time() . '_' . uniqid() . '_' . $gambar_baru;
+            $pathBaru = $folder . $newName;
+
+            // Upload gambar baru
+            if (move_uploaded_file($tmp, $pathBaru)) {
+                $update_gambar .= "$field = '$newName', ";
+
+                // Hapus gambar lama jika ada
+                $gambar_lama = $tampilMain[$field];
+                if (!empty($gambar_lama) && file_exists($folder . $gambar_lama)) {
+                    unlink($folder . $gambar_lama);
+                }
+            }
+        }
+    }
+
+    // Query update TANPA updated_at
+    $query = "UPDATE tb_main_content SET 
+              judul_portal = '$judul_portal', 
+              deskripsi = '$deskripsi',
+              link_teknis = '$link_teknis',
+              link_reels = '$link_reels',
+              link_contact = '$link_contact',
+              " . $update_gambar . "
+              id_content = '$id_content'
+              WHERE id_content = '$id_content'";
+
+    if (mysqli_query($koneksi, $query)) {
+        $_SESSION['alert_message'] = '
+        <div id="alert-2" class="flex items-center p-4 text-[var(--text-success)] rounded-2xl bg-[var(--bg-success)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+            <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                Main Content berhasil diperbarui!
+            </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-success)]/30 text-[var(--text-success)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-success)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+            </button>
+        </div>';
+    } else {
+        $_SESSION['alert_message'] = '
+        <div id="alert-2" class="flex items-center p-4 text-[var(--text-danger)] rounded-2xl bg-[var(--bg-danger)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+            <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                Gagal memperbarui Main Content: ' . mysqli_error($koneksi) . '
+            </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-danger)]/30 text-[var(--text-danger)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-danger)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+            </button>
+        </div>';
+    }
+
+    header("Location: main-content.php");
+    exit;
+}
+
+function selamatkanWaktu()
+{
+    date_default_timezone_set('Asia/Jakarta');
+    $jam = date("G"); // 0-23
+
+    if ($jam >= 0 && $jam < 12) {
+        return "Selamat Pagi";
+    } elseif ($jam >= 12 && $jam < 15) {
+        return "Selamat Siang";
+    } elseif ($jam >= 15 && $jam < 18) {
+        return "Selamat Sore";
+    } else {
+        return "Selamat Malam";
+    }
+}
+
+// Memanggil fungsi dan menampilkan hasilnya
+$sapaan = selamatkanWaktu();
+
+?>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tentang - Admin Dashboard</title>
+    <title>Main Content - Admin Dashboard</title>
 
     <!-- Flowbite CSS -->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
@@ -52,7 +187,7 @@
             <hr class="borer border-[var(--txt-primary)]/30 mx-2 my-8">
             <ul class="space-y-3 font-medium">
                 <li>
-                    <a href="../dashboard.html"
+                    <a href="../dashboard.php"
                         class="flex items-center px-4 py-2.5 text-[var(--txt-primary)] rounded-xl hover:bg-[var(--bg-secondary3)]/10 group">
                         <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -69,9 +204,9 @@
                 <!-- Kelola Konten -->
                 <li>
                     <button type="button"
-                        class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group bg-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/20"
+                        class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group bg-transparent hover:bg-[var(--bg-secondary3)]/10"
                         aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">
-                        <svg class="w-5 h-5 text-[var(--txt-primary)]" aria-hidden="true"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             viewBox="0 0 24 24">
                             <path fill-rule="evenodd"
@@ -87,12 +222,12 @@
                     </button>
                     <ul id="dropdown-example" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="tentang.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group bg-[var(--bg-secondary3)]/20 hover:bg-[var(--bg-secondary3)]/10">
+                            <a href="../kelola-konten/tentang.php"
+                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 transition duration-75 text-[var(--txt-primary)]" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    fill="currentColor" viewBox="0 0 24 24">
                                     <path
                                         d="M3 4.92857C3 3.90506 3.80497 3 4.88889 3H19.1111C20.195 3 21 3.90506 21 4.92857V13h-3v-2c0-.5523-.4477-1-1-1h-4c-.5523 0-1 .4477-1 1v2H3V4.92857ZM3 15v1.0714C3 17.0949 3.80497 18 4.88889 18h3.47608L7.2318 19.3598c-.35356.4243-.29624 1.0548.12804 1.4084.42428.3536 1.05484.2962 1.40841-.128L10.9684 18h2.0632l2.2002 2.6402c.3535.4242.9841.4816 1.4084.128.4242-.3536.4816-.9841.128-1.4084L15.635 18h3.4761C20.195 18 21 17.0949 21 16.0714V15H3Z" />
                                     <path d="M16 12v1h-2v-1h2Z" />
@@ -102,7 +237,7 @@
                         </li>
 
                         <li>
-                            <a href="program.html"
+                            <a href="../kelola-konten/program.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -116,8 +251,8 @@
                         </li>
 
                         <li>
-                            <a href="divisi.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
+                            <a href="../kelola-konten/divisi.php"
+                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group bg-transparent hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -131,7 +266,7 @@
                         </li>
 
                         <li>
-                            <a href="news.html"
+                            <a href="../kelola-konten/news.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -147,7 +282,7 @@
                         </li>
 
                         <li>
-                            <a href="galeri.html"
+                            <a href="../kelola-konten/galeri.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -167,9 +302,9 @@
                 <!-- Portal Lomba -->
                 <li>
                     <button type="button"
-                        class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group hover:bg-[var(--bg-secondary3)]/10 mt-2"
+                        class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer bg-[var(--bg-secondary3)]/30 group hover:bg-[var(--bg-secondary3)]/20 mt-2"
                         aria-controls="dropdownPortalLomba" data-collapse-toggle="dropdownPortalLomba">
-                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)] group-hover:text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             fill="currentColor" viewBox="0 0 24 24">
                             <path
@@ -185,12 +320,11 @@
                     </button>
                     <ul id="dropdownPortalLomba" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="#"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
+                            <a href="../portal-lomba/main-content.php"
+                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group bg-[var(--bg-secondary3)]/20 hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[var(--txt-primary)] group-hover:text-[var(--txt-primary)]" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                     <path
                                         d="M3 4.92857C3 3.90506 3.80497 3 4.88889 3H19.1111C20.195 3 21 3.90506 21 4.92857V13h-3v-2c0-.5523-.4477-1-1-1h-4c-.5523 0-1 .4477-1 1v2H3V4.92857ZM3 15v1.0714C3 17.0949 3.80497 18 4.88889 18h3.47608L7.2318 19.3598c-.35356.4243-.29624 1.0548.12804 1.4084.42428.3536 1.05484.2962 1.40841-.128L10.9684 18h2.0632l2.2002 2.6402c.3535.4242.9841.4816 1.4084.128.4242-.3536.4816-.9841.128-1.4084L15.635 18h3.4761C20.195 18 21 17.0949 21 16.0714V15H3Z" />
                                     <path d="M16 12v1h-2v-1h2Z" />
@@ -200,25 +334,24 @@
                         </li>
 
                         <li>
-                            <a href="#"
+                            <a href="../portal-lomba/data-peserta.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    fill="currentColor" viewBox="0 0 24 24">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-person-lines-fill w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                                    viewBox="0 0 16 16">
                                     <path
-                                        d="M10.83 5a3.001 3.001 0 0 0-5.66 0H4a1 1 0 1 0 0 2h1.17a3.001 3.001 0 0 0 5.66 0H20a1 1 0 1 0 0-2h-9.17ZM4 11h9.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-1.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2Zm1.17 6H4a1 1 0 1 0 0 2h1.17a3.001 3.001 0 0 0 5.66 0H20a1 1 0 1 0 0-2h-9.17a3.001 3.001 0 0 0-5.66 0Z" />
+                                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z" />
                                 </svg>
 
-                                <span class="ms-3">S&K</span></a>
+                                <span class="ms-3">Data Peserta</span></a>
                         </li>
 
                         <li>
-                            <a href="#"
+                            <a href="../portal-lomba/atur-form.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd"
                                         d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
                                         clip-rule="evenodd" />
@@ -238,7 +371,7 @@
                         class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group hover:bg-[var(--bg-secondary3)]/10 mt-2"
                         aria-controls="dropdownInteraksi" data-collapse-toggle="dropdownInteraksi">
 
-                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)] group-hover:text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             fill="currentColor" viewBox="0 0 24 24">
                             <path fill-rule="evenodd"
@@ -254,7 +387,7 @@
                     </button>
                     <ul id="dropdownInteraksi" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="../interaksi/biyouth.html"
+                            <a href="../interaksi/biyouth.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -269,7 +402,7 @@
                         </li>
 
                         <li>
-                            <a href="../interaksi/aspirasi.html"
+                            <a href="../interaksi/aspirasi.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -282,39 +415,21 @@
                                 </svg>
                                 <span class="ms-3">Aspirasi</span></a>
                         </li>
-
-                        <li>
-                            <a href="../interaksi/atur-form.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd"
-                                        d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
-                                        clip-rule="evenodd" />
-                                    <path fill-rule="evenodd"
-                                        d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span class="ms-3">Atur Form</span>
-                            </a>
-                        </li>
                     </ul>
                 </li>
 
                 <hr class="border-b border-[var(--txt-primary)]/20 mx-2 my-6">
 
                 <li>
-                    <a href="#"
-                        class="flex items-center px-4 py-2.5 text-[var(--txt-primary)] rounded-xl hover:bg-[var(--bg-secondary3)]/10 group">
+                    <button data-modal-target="modalLogout" data-modal-toggle="modalLogout"
+                        class="flex items-center px-4 py-2.5 text-[var(--txt-primary)] rounded-xl hover:bg-[var(--bg-secondary3)]/10 group w-full cursor-pointer">
                         <svg class="w-5 h-5 text-[var(--txt-primary)]/50 transition duration-75 group-hover:text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2" />
                         </svg>
                         <span class="ms-3">Logout</span>
-                    </a>
+                    </button>
                 </li>
 
             </ul>
@@ -322,17 +437,44 @@
     </aside>
     <!-- Tutup Sidebar -->
 
+    <!-- Modal Logout -->
+    <div id="modalLogout" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-[var(--bg-primary)] rounded-lg shadow-sm">
+                <button type="button" class="absolute top-3 end-2.5 text-[var(--txt-primary)]/50 bg-transparent hover:bg-[var(--txt-primary)]/30 hover:text-[var(--txt-primary)]/80 rounded-xl text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer" data-modal-hide="modalLogout">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+                <div class="p-4 md:p-5 text-center">
+                    <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <h3 class="mb-5 text-lg font-normal text-[var(--txt-primary)]/60">
+                        Yakin ingin Logout?
+                    </h3>
+                    <button data-modal-hide="modalLogout" type="button" class="cursor-pointer py-2.5 px-5 text-sm font-medium text-[var(--txt-primary)] focus:outline-none bg-[var(--bg-secondary3)]/0 rounded-lg border border-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/10 hover:text-[var(--txt-primary)] focus:z-10 ">Cancel</button>
+                    <a type="button" href="../logout.php" data-modal-hide="modalLogout" type="button" class="ms-2 text-[var(--txt-primary2)] bg-[var(--bg-secondary3)]/80 hover:bg-[var(--bg-secondary3)] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content Dashboard -->
     <div class="px-4 md:px-4 lg:px-8 sm:ml-64">
         <div class="grid grid-cols-2 gap-4 mt-6 sm:mt-4">
             <div class="flex items-center justify-start h-10 md:h-20">
                 <h1 class="text-lg md:text-2xl lg:text-2xl font-bold text-[var(--txt-primary2)]">
-                    Kelola Konten
+                    Portal Lomba
                 </h1>
             </div>
             <div class="flex items-center justify-end h-10 md:h-20">
                 <h1 class="text-end text-md md:text-lg lg:text-xl font-light text-[var(--txt-primary2)]/80">
-                    Selamat Pagi, Admin!
+                    <?php echo $sapaan; ?>,
+                    <?php echo $username; ?>!
                 </h1>
             </div>
         </div>
@@ -341,35 +483,60 @@
 
         <div class="flex flex-col gap-6">
             <h1 class="text-md md:text-lg lg:text-xl xl:text-2xl font-semibold text-[var(--txt-primary2)] text-start">
-                Tentang Kami
+                Main Content
             </h1>
-            <div
-                class="grid grid-cols-1 xl:grid-cols-2 gap-10 border border-[var(--txt-primary2)]/50 rounded-2xl p-4 lg:p-6">
-                <img src="../../assets/img/img-about-2.png" class="w-full rounded-md" alt="Img About">
-                <div class="flex flex-col justify-center items-start gap-6">
-                    <h1 class="text-lg lg:text-xl xl:text-2xl font-normal text-[var(--txt-primary2)]">
-                        Kerja Cerdas, Kerja Ikhlas
-                    </h1>
-                    <p
-                        class="text-lg lg:text-xl xl:text-2xl text-justify font-normal text-[var(--txt-primary2)] leading-relaxed">
-                        OSIS (Organisasi Siswa Intra Sekolah) SMK Bina Informatika adalah wadah bagi peserta didik untuk
-                        berkembang, berkreasi, dan berkontribusi dalam membangun sekolah yang lebih baik dan
-                        berprestasi. Kami hadir sebagai jembatan aspirasi, penggerak inovasi, dan pelopor kegiatan
-                        positif bagi seluruh siswa
-                    </p>
-                    <button data-modal-target="modalEditTentang" data-modal-toggle="modalEditTentang"
-                        class="bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/50 border-2 border-[var(--bg-secondary)] px-4 py-2 rounded-2xl flex items-center justify-center text-lg lg:text-xl gap-2 shadow-lg cursor-pointer hover:shadow-none transition duration-300">
-                        <svg class="w-6 lg:w-8 h-6 lg:h-8 text-[var(--txt-primary2)]" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
-                        </svg>
-                        Edit
-                    </button>
+            <?php echo $alert_message; ?>
+            <div class="flex flex-col border border-[var(--txt-primary2)]/50 rounded-2xl p-4 lg:p-6 mb-32">
+                <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-10">
+                    <div class="flex flex-col items-start justify-center gap-4">
+                        <h1 class="text-lg md:text-xl lg:text-2xl font-bold text-start text-[var(--txt-primary2)]">
+                            <?= $tampilMain['judul_portal']; ?>
+                        </h1>
+                        <p class="text-md md:text-lg lg:text-xl font-normal text-start text-[var(--txt-primary2)]">
+                            <?= $tampilMain['deskripsi']; ?>
+                        </p>
+                    </div>
+                    <div class="flex flex-col items-center justify-center gap-4">
+                        <a href="<?= $tampilMain['link_teknis']; ?>" target="_blank"
+                            class="w-full text-center py-2 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-lg cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none">
+                            TEKNIS LOMBA
+                        </a>
+                        <a href="<?= $tampilMain['link_reels']; ?>" target="_blank"
+                            class="w-full text-center py-2 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-lg cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none">
+                            REELS INFORMASI LOMBA
+                        </a>
+                        <a href="<?= $tampilMain['link_contact']; ?>" target="_blank"
+                            class="w-full text-center py-2 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-lg cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none">
+                            CONTACT PERSON
+                        </a>
+                    </div>
                 </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-12 justify-center gap-8">
+                    <img src="../../assets/img/galeri/<?= $tampilMain['gambar_1']; ?>"
+                        class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary3)]/50 rounded-3xl hover:bg-[var(--bg-secondary3)] transition duration-500 border-2 border-[var(--bg-primary)]/20 hover:border-[var(--bg-primary)] cursor-pointer hover:scale-101 shadow-md"
+                        alt="Galeri" />
+                    <img src="../../assets/img/galeri/<?= $tampilMain['gambar_2']; ?>"
+                        class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary3)]/50 rounded-3xl hover:bg-[var(--bg-secondary3)] transition duration-500 border-2 border-[var(--bg-primary)]/20 hover:border-[var(--bg-primary)] cursor-pointer hover:scale-101 shadow-md"
+                        alt="Galeri" />
+                    <img src="../../assets/img/galeri/<?= $tampilMain['gambar_3']; ?>"
+                        class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary3)]/50 rounded-3xl hover:bg-[var(--bg-secondary3)] transition duration-500 border-2 border-[var(--bg-primary)]/20 hover:border-[var(--bg-primary)] cursor-pointer hover:scale-101 shadow-md"
+                        alt="Galeri" />
+                    <img src="../../assets/img/galeri/<?= $tampilMain['gambar_4']; ?>"
+                        class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bbg-[var(--bg-secondary3)]/50 rounded-3xl hover:bg-[var(--bg-secondary3)] transition duration-500 border-2 border-[var(--bg-primary)]/20 hover:border-[var(--bg-primary)] cursor-pointer hover:scale-101 shadow-md"
+                        alt="Galeri" />
+                </div>
+                <button data-modal-target="modalEditMainContent" data-modal-toggle="modalEditMainContent"
+                    class="bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/50 border-2 border-[var(--bg-secondary)] px-4 py-2 rounded-2xl flex items-center justify-center text-lg lg:text-xl gap-2 shadow-lg cursor-pointer hover:shadow-none transition duration-300 mt-12 ms-auto">
+                    <svg class="w-6 lg:w-8 h-6 lg:h-8 text-[var(--txt-primary2)]" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
+                    </svg>
+                    Edit
+                </button>
 
                 <!-- Modal Edit - Tentang -->
-                <div id="modalEditTentang" tabindex="-1" aria-hidden="true"
+                <div id="modalEditMainContent" tabindex="-1" aria-hidden="true"
                     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div class="relative p-4 w-full max-w-xl max-h-full">
                         <!-- Modal content -->
@@ -378,11 +545,11 @@
                             <div
                                 class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-[var(--bg-primary)]/50">
                                 <h3 class="text-xl font-semibold text-[var(--txt-primary2)]">
-                                    Edit Tentang Kami
+                                    Edit Main Content
                                 </h3>
                                 <button type="button"
                                     class="end-2.5 text-[var(--txt-primary2)]/80 bg-transparent hover:bg-[var(--bg-primary)]/20 hover:text-[var(--txt-primary2)] rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer"
-                                    data-modal-hide="modalEditTentang">
+                                    data-modal-hide="modalEditMainContent">
                                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                         fill="none" viewBox="0 0 14 14">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -393,37 +560,99 @@
                             </div>
                             <!-- Modal body -->
                             <div class="p-4 md:p-5">
-                                <form class="space-y-4" action="#">
+                                <form class="space-y-4" action="" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="id_content" value="<?= $tampilMain['id_content']; ?>">
                                     <div class="mb-6">
-                                        <img src="../../assets/img/img-about.png" alt="Image About" class="w-full mb-6">
-                                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
-                                            for="file_input">
-                                            Unggah Gambar
-                                        </label>
-                                        <input
-                                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
-                                            id="file_input" type="file">
-
-                                    </div>
-                                    <div class="mb-6">
-                                        <label for="text"
+                                        <label for="titleText"
                                             class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
-                                            Tagline
+                                            Title Text
                                         </label>
-                                        <input type="text" name="tagline" id="text"
+                                        <input type="text" name="judul_portal" id="titleText" value="<?= $tampilMain['judul_portal']; ?>"
                                             class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"
-                                            value="Kerja Keras, Kerja Ikhlas" required />
+                                            value="PORTAL LOMBA BI CLASSICA" />
                                     </div>
-
                                     <div>
-                                        <label for="deskripsiTentang"
+                                        <label for="deskripsi"
                                             class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
                                             Deskripsi
                                         </label>
-                                        <textarea id="deskripsiTentang" rows="4"
-                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5">OSIS (Organisasi Siswa Intra Sekolah) SMK Bina Informatika adalah wadah bagi peserta didik untuk berkembang, berkreasi, dan berkontribusi dalam membangun sekolah yang lebih baik dan berprestasi. Kami hadir sebagai jembatan aspirasi, penggerak inovasi, dan pelopor kegiatan positif bagi seluruh siswa</textarea>
+                                        <textarea id="deskripsi" rows="4" name="deskripsi"
+                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"><?= $tampilMain['deskripsi']; ?></textarea>
                                     </div>
-                                    <button type="submit"
+                                    <h1 class="text-lg mt-12">
+                                        Link Main Content
+                                    </h1>
+                                    <div class="mb-6">
+                                        <label for="linkTeknisLomba"
+                                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
+                                            Link Teknis Lomba
+                                        </label>
+                                        <input type="text" name="link_teknis" id="linkTeknisLomba"
+                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"
+                                            value="<?= $tampilMain['link_teknis']; ?>" />
+                                    </div>
+                                    <div class="mb-6">
+                                        <label for="linkInformasiLomba"
+                                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
+                                            Link Informasi Lomba
+                                        </label>
+                                        <input type="text" name="link_reels" id="linkInformasiLomba"
+                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"
+                                            value="<?= $tampilMain['link_reels']; ?>" />
+                                    </div>
+                                    <div class="mb-6">
+                                        <label for="linkContact"
+                                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
+                                            Link Contact
+                                        </label>
+                                        <input type="text" name="link_contact" id="linkContact"
+                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"
+                                            value="<?= $tampilMain['link_contact']; ?>" />
+                                    </div>
+                                    <h1 class="text-lg mt-12">
+                                        Gambar/Galeri Portal Lomba
+                                    </h1>
+                                    <div class="mb-6">
+                                        <img src="../../assets/img/galeri/<?= $tampilMain['gambar_1']; ?>" alt="Image" class="mb-6">
+                                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
+                                            for="imgGaleri1">
+                                            Gambar 1
+                                        </label>
+                                        <input name="gambar_1"
+                                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
+                                            id="imgGaleri1" type="file">
+                                    </div>
+                                    <div class="mb-6">
+                                        <img src="../../assets/img/galeri/<?= $tampilMain['gambar_2']; ?>" alt="Image" class="mb-6">
+                                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
+                                            for="imgGaleri2">
+                                            Gambar 2
+                                        </label>
+                                        <input name="gambar_2"
+                                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
+                                            id="imgGaleri2" type="file">
+                                    </div>
+                                    <div class="mb-6">
+                                        <img src="../../assets/img/galeri/<?= $tampilMain['gambar_3']; ?>" alt="Image" class="mb-6">
+                                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
+                                            for="imgGaleri3">
+                                            Gambar 3
+                                        </label>
+                                        <input name="gambar_3"
+                                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
+                                            id="imgGaleri3" type="file">
+                                    </div>
+                                    <div class="mb-6">
+                                        <img src="../../assets/img/galeri/<?= $tampilMain['gambar_4']; ?>" alt="Image" class="mb-6">
+                                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
+                                            for="imgGaleri1">
+                                            Gambar 4
+                                        </label>
+                                        <input name="gambar_4"
+                                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
+                                            id="imgGaleri1" type="file">
+                                    </div>
+                                    <button type="submit" name="ubah"
                                         class="w-full text-[var(--txt-primary2)] bg-[var(--bg-secondary)]/80 hover:bg-[var(--bg-secondary)] focus:ring-4 focus:outline-none focus:ring-[var(--txt-primary2)]/60 font-bold rounded-xl text-lg cursor-pointer px-5 py-2.5 text-center mt-4 transition duration-500">
                                         Simpan
                                     </button>
@@ -432,7 +661,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

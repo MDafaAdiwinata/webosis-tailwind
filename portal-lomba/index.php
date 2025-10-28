@@ -1,4 +1,71 @@
-<!DOCTYPE html>
+<?php
+
+session_start();
+include '../koneksi.php';
+
+$alert = "";
+
+if (isset($_POST['login'])) {
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
+
+    if ($username == "" || $password == "") {
+        $alert = '
+        <div id="alert-2" class="flex items-center p-4 text-[var(--text-warning)] rounded-2xl bg-[var(--bg-warning)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                    Username atau Password tidak boleh Kosong!
+                </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-secondary)]/30 text-[var(--bg-secondary)] rounded-lg cursor-pointer focus:ring-2 p-1.5 hover:bg-[var(--bg-secondary)]/0 transition duration-300 border border-[var(--bg-secondary)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+            </button>
+        </div>';
+    } else {
+        // Mengamankan input dan membuat query case-sensitive
+        $username_secure = mysqli_real_escape_string($koneksi, $username);
+        $sql = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE BINARY username = '$username_secure'");
+        $data = mysqli_fetch_assoc($sql);
+
+        if ($data) {
+            if (password_verify($password, $data['password'])) {
+                // Menggunakan username dari DB untuk konsistensi session
+                $_SESSION['username'] = $data['username'];
+                echo "<script>
+                  alert('Login Berhasil! Selamat Datang!');
+                  window.location.href = 'portal-lomba.php';
+                </script>";
+            } else {
+                $alert = '<div id="alert-3" class="flex items-center p-4 text-[var(--text-danger)] rounded-2xl bg-[var(--bg-danger)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                   Password Salah!
+                </div>
+        </div>';
+            }
+        } else {
+            $alert = '<div id="alert-3" class="flex items-center p-4 text-[var(--text-info)] rounded-2xl border border-[var(--border-info)] bg-[var(--bg-info)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                   Username tidak Di temukan
+                </div>
+        </div>';
+        }
+    }
+}
+
+?>
 <html lang="en">
 
 <head>
@@ -57,7 +124,7 @@
                 <ul
                     class="font-bold flex flex-col p-4 md:p-0 mt-8 border border-[var(--txt-primary)]/30 rounded-lg bg-[var(--bg-navbar-mobile)] md:bg-transparent md:flex-row md:space-x-14 rtl:space-x-reverse md:space-y-0 space-y-2 md:mt-0 md:border-0 items-center me-0 md:me-10">
                     <li>
-                        <a href="../index.html"
+                        <a href="../index.php"
                             class="block py-2 px-3 text-[var(--txt-primary)] rounded-sm md:p-0 hover:text-[var(--bg-secondary)] text-md md:text-xl transition duration-300"
                             aria-current="page">HOME</a>
                     </li>
@@ -73,7 +140,7 @@
     <section id="heroLoginSection"
         class="flex items-center justify-center h-screen bg-[var(--bg-secondary2)] bg-cover bg-center">
         <div class="px-4 container mx-auto py-24 lg:py-56">
-            <form class="max-w-md mx-auto bg-white/90 p-6 md:p-8 rounded-2xl">
+            <form class="max-w-md mx-auto bg-white/90 p-6 md:p-8 rounded-2xl" action="" method="POST">
                 <div class="mx-auto text-center mb-6">
                     <div class="flex mx-auto mb-4 items-center justify-center gap-2 md:gap-4">
                         <img src="../assets/img/portlom/logo-bi-portlom.png" class="w-12 md:w-15" alt="">
@@ -94,11 +161,11 @@
                     <label for="password" class="block mb-2 text-sm sm:text-md md:text-lg font-medium text-[var(--txt-primary2)]">
                         Password:
                     </label>
-                    <input type="password" id="password"
+                    <input type="password" id="password" name="password"
                         class="bg-transparent border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]/50 block w-full px-3 py-2.5"
                         required />
                 </div>
-                <button type="submit"
+                <button type="submit" name="login"
                     class="mt-4 text-[var(--txt-primary2)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/80 focus:ring-3 focus:outline-none focus:ring-[var(--bg-primary)] font-bold rounded-xl text-lg w-full px-5 py-2 text-center cursor-pointer transition duration-500">
                     LOGIN
                 </button>

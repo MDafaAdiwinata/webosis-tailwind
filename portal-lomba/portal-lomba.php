@@ -1,4 +1,27 @@
-<!DOCTYPE html>
+<?php
+
+include "../koneksi.php";
+session_start();
+if (!isset($_SESSION['username'])) {
+    echo "
+    <script>
+        alert('Silahkan Login Terlebih Dahulu!');
+        window.location.href = 'index.php';
+    </script>
+    ";
+}
+
+// Ambil username dari session untuk ditampilkan
+$username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Unknown';
+$input_lomba = mysqli_query($koneksi, "SELECT * FROM tb_input_lomba WHERE status='aktif' ORDER BY id ASC");
+
+
+// Query Ambil Data dari table about
+$sql = "SELECT * FROM tb_main_content";
+$ambilMain = mysqli_query($koneksi, $sql);
+$tampilMain = mysqli_fetch_assoc($ambilMain);
+
+?>
 <html lang="en">
 
 <head>
@@ -58,7 +81,7 @@
                 <ul
                     class="font-bold flex flex-col p-4 md:p-0 mt-8 border border-[var(--txt-primary)]/30 rounded-lg bg-[var(--bg-navbar-mobile)] md:bg-transparent md:flex-row md:space-x-14 rtl:space-x-reverse md:space-y-0 space-y-2 md:mt-0 md:border-0 items-center me-0 md:me-10">
                     <li>
-                        <a href="../index.html"
+                        <a href="../index.php"
                             class="block py-2 px-3 text-[var(--txt-primary)] rounded-sm md:p-0 hover:text-[var(--bg-secondary)] text-md md:text-xl transition duration-300"
                             aria-current="page">HOME</a>
                     </li>
@@ -73,43 +96,41 @@
 
     <section id="heroSectionPortalLomba" class="flex flex-col items-center bg-[var(--bg-secondary3)]">
         <div class="px-4 container mx-auto pt-52">
-            <h2 class="text-xl md:text-2xl lg:text-3xl text-center underline text-[var(--txt-primary2)]">Halo XII DKV!
-                Selamat datang di,</h2>
+            <h2 class="text-xl md:text-2xl lg:text-3xl text-center underline text-[var(--txt-primary2)]">
+                Halo <?php echo $username; ?>! Selamat Datang di,
+            </h2>
             <h1 class="text-2xl md:text-4xl lg:text-6xl text-center my-4 md:my-8 text-[var(--bg-secondary2)] font-bold">
-                PORTAL LOMBA BI CLASSICA</h1>
+                <?= $tampilMain['judul_portal']; ?>
+            </h1>
             <p
                 class="text-md md:text-xl lg:text-2xl text-justify text-[var(--txt-primary2)] w-full lg:w-3/4 mx-auto leading-6 md:leading-8 lg:leading-11 font-light">
-                Selamat datang di portal pendaftaran BI Classica 2025! 🎉 Ajang tahunan SMK Bina Informatika ini menjadi
-                wadah
-                kreativitas, bakat, dan prestasi peserta didik. Melalui formulir ini, kamu dapat mendaftarkan diri
-                sesuai cabang lomba
-                yang diminati.
+                <?= $tampilMain['deskripsi']; ?>.
             </p>
             <div class="flex flex-col lg:flex-row items-center justify-center mt-12 gap-4 lg:gap-10">
-                <a href=""
-                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none">
+                <a href="<?= $tampilMain['link_teknis']; ?>"
+                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank">
                     TEKNIS LOMBA
                 </a>
-                <a href=""
-                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none">
+                <a href="<?= $tampilMain['link_reels']; ?>"
+                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank">
                     REELS INFORMASI LOMBA
                 </a>
-                <a href=""
-                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none">
+                <a href="<?= $tampilMain['link_contact']; ?>"
+                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank">
                     CONTACT PERSON
                 </a>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mt-12 md:mt-18 mb-32 gap-4">
-                <img src="../assets/img/galeri/galeri1.png"
+                <img src="../assets/img/galeri/<?= $tampilMain['gambar_1']; ?>"
                     class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
                     alt="Galeri" />
-                <img src="../assets/img/galeri/galeri2.png"
+                <img src="../assets/img/galeri/<?= $tampilMain['gambar_2']; ?>"
                     class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
                     alt="Galeri" />
-                <img src="../assets/img/galeri/galeri3.png"
+                <img src="../assets/img/galeri/<?= $tampilMain['gambar_3']; ?>"
                     class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
                     alt="Galeri" />
-                <img src="../assets/img/galeri/galeri4.png"
+                <img src="../assets/img/galeri/<?= $tampilMain['gambar_4']; ?>"
                     class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
                     alt="Galeri" />
             </div>
@@ -125,7 +146,7 @@
 
             <h1
                 class="w-fit text-xl font-bold text-center text-[var(--txt-primary2)] md:text-2xl lg:text-4xl bg-[var(--bg-secondary3)] py-2 md:py-4 px-12 mx-auto rounded-3xl shadow-lg">
-                SYARAT DAN KETENTUAN    
+                SYARAT DAN KETENTUAN
             </h1>
             <p
                 class="w-full lg:w-3/4 mx-auto text-md md:text-xl mt-8 md:mt-12 bg-[var(--bg-secondary3)] p-8 md:px-8 md:py-8 lg:px-12 lg:py-8 xl:px-18 xl:py-10 rounded-3xl leading-6 md:leading-10 font-light shadow-xl">
@@ -157,12 +178,12 @@
                 <label for="kelas" class="block text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
                     Kelas
                 </label>
-                <select id="kelas" 
+                <select id="kelas"
                     class="bg-[var(--bg-secondary)] border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl block w-full px-6 py-2 md:py-4 mt-3 hover:cursor-pointer hover:bg-[var(--bg-secondary)]/90 transition duration-500">
-                    <option selected></option>
-                    <option value="US">X</option>
-                    <option value="CA">XI</option>
-                    <option value="DE">XII</option>
+                    <option value=""></option>
+                    <option value="X">X</option>
+                    <option value="XI">XI</option>
+                    <option value="XII">XII</option>
                 </select>
 
                 <label for="jurusan" class="block mt-8 md:mt-14 text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
@@ -170,44 +191,29 @@
                 </label>
                 <select id="jurusan"
                     class="bg-[var(--bg-secondary)] border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl block w-full px-6 py-2 md:py-4 mt-3 hover:cursor-pointer hover:bg-[var(--bg-secondary)]/90 transition duration-500">
-                    <option selected></option>
-                    <option value="US">Desain Komunikasi Visual</option>
-                    <option value="CA">Rekayasa Perangkat Lunak</option>
-                    <option value="DE">Teknik Komputer Jaringan</option>
-                    <option value="DE">Animasi</option>
-                    <option value="DE">Broadcasting TV</option>
-                    <option value="DE">Game Development</option>
+                    <option value=""></option>
+                    <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+                    <option value="Rekayasa Perangkat Lunak">Rekayasa Perangkat Lunak</option>
+                    <option value="Teknik Komputer Jaringan">Teknik Komputer Jaringan</option>
+                    <option value="Animasi">Animasi</option>
+                    <option value="Broadcasting TV">Broadcasting TV</option>
+                    <option value="Game Development">Game Development</option>
                 </select>
 
-                <label for="noWa" class="block mt-8 md:mt-14 text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
-                    Nomor WhatsApp Ketua Kelas 📱💬
-                </label>
-                <input type="number" id="noWa"
-                    class="bg-[var(--bg-secondary3)] border border-[var(--txt-primary2)]/80 text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl focus:ring-[var(--txt-primary2)] mt-3 focus:border-[var(--txt-primary2)] block w-full px-4 py-2.5 md:py-4"
-                    placeholder="..." required />
+                <?php while ($tampil_input_lomba = mysqli_fetch_assoc($input_lomba)) : ?>
+                    <label for="<?= $tampil_input_lomba['nama_lomba']; ?>"
+                        class="block mt-8 md:mt-14 text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
+                        <?= $tampil_input_lomba['label_lomba'] . ' ' . $tampil_input_lomba['emoji']; ?>
+                    </label>
+                    <input
+                        type="<?= $tampil_input_lomba['jenis_input']; ?>"
+                        id="<?= $tampil_input_lomba['nama_lomba']; ?>"
+                        name="<?= $tampil_input_lomba['nama_lomba']; ?>"
+                        class="bg-[var(--bg-secondary3)] border border-[var(--txt-primary2)]/80 text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl focus:ring-[var(--txt-primary2)] mt-3 focus:border-[var(--txt-primary2)] block w-full px-4 py-2.5 md:py-4"
+                        placeholder="..." required />
+                <?php endwhile; ?>
 
-                <label for="lombaBasketPutra" class="block mt-8 md:mt-14 text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
-                    Lomba Basket Putra 🏀👦🔥
-                </label>
-                <input type="text" id="lombaBasketPutra"
-                    class="bg-[var(--bg-secondary3)] border border-[var(--txt-primary2)]/80 text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl focus:ring-[var(--txt-primary2)] mt-3 focus:border-[var(--txt-primary2)] block w-full px-4 py-2.5 md:py-4"
-                    placeholder="..." required />
-
-                <label for="lombaBasketPutri" class="block mt-8 md:mt-14 text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
-                    Lomba Basket Putri 🏀👧✨
-                </label>
-                <input type="text" id="lombaBasketPutri"
-                    class="bg-[var(--bg-secondary3)] border border-[var(--txt-primary2)]/80 text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl focus:ring-[var(--txt-primary2)] mt-3 focus:border-[var(--txt-primary2)] block w-full px-4 py-2.5 md:py-4"
-                    placeholder="..." required />
-
-                <label for="lombaFutsalPutra" class="block mt-8 md:mt-14 text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
-                    Lomba Futsal Putra ⚽👟💨
-                </label>
-                <input type="text" id="lombaFutsalPutra"
-                    class="bg-[var(--bg-secondary3)] border border-[var(--txt-primary2)]/80 text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl focus:ring-[var(--txt-primary2)] mt-3 focus:border-[var(--txt-primary2)] block w-full px-4 py-2.5 md:py-4"
-                    placeholder="..." required />
-
-                <button type="submit"
+                <button type="submit" name="kirim"
                     class="text-[var(--txt-primary2)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/80 focus:ring-3 focus:outline-none focus:ring-[var(--bg-secondary)] ms-auto font-bold rounded-full text-md md:text-xl w-full md:w-fit px-8 py-2.5 mt-12 cursor-pointer transition duration-500 shadow-md">
                     Kirim
                 </button>

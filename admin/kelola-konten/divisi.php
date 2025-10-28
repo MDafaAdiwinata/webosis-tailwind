@@ -1,10 +1,121 @@
-<!DOCTYPE html>
+<?php
+include "../../koneksi.php";
+session_start();
+if (!isset($_SESSION['username'])) {
+    echo "
+    <script>
+        alert('Silahkan Login Terlebih Dahulu!');
+        window.location.href = '../index.php';
+    </script>
+    ";
+}
+
+// Ambil username dari session untuk ditampilkan
+$username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Unknown';
+
+// Menyiapkan variabel untuk pesan alert dari session
+$alert_message = '';
+if (isset($_SESSION['alert_message'])) {
+    $alert_message = $_SESSION['alert_message'];
+    unset($_SESSION['alert_message']); // Hapus pesan dari session agar tidak tampil lagi
+}
+
+// Fitur Filter
+
+// Ambil nilai filter dari GET
+$kategori_divisi = isset($_GET['kategori_divisi']) ? $_GET['kategori_divisi'] : '';
+$urutkan_data = isset($_GET['urutkan_data']) ? $_GET['urutkan_data'] : '';
+$search   = isset($_GET['search']) ? $_GET['search'] : '';
+
+// Bangun query
+$sql = "SELECT * FROM tb_divisi WHERE 1=1";
+
+if ($kategori_divisi != '') {
+    $sql .= " AND tagline_divisi = '$kategori_divisi'";
+}
+if ($search != '') {
+    $sql .= " AND (id_divisi LIKE '%$search%' or tagline_divisi LIKE '%$search%' or img_divisi LIKE '%$search%')";
+}
+if ($urutkan_data == 'terbaru') {
+    $sql .= " ORDER BY id_divisi ASC";
+} elseif ($urutkan_data == 'terlama') {
+    $sql .= " ORDER BY id_divisi DESC";
+}
+
+// Eksekusi query
+$ambilDivisi = mysqli_query($koneksi, $sql);
+
+// Delete Data
+if (isset($_GET['kode'])) {
+    $id_divisi = mysqli_real_escape_string($koneksi, $_GET['kode']);
+
+    // Ambil nama file gambar untuk dihapus dari server
+    $result = mysqli_query($koneksi, "SELECT img_divisi FROM tb_divisi WHERE id_divisi='$id_divisi'");
+    $data   = mysqli_fetch_array($result);
+
+    if ($data) {
+        $gambar_untuk_dihapus = $data['img_divisi'];
+        $file_path = "../../assets/img/divisi/" . $gambar_untuk_dihapus;
+
+        // Cek jika file gambar ada, lalu hapus
+        if (!empty($gambar_untuk_dihapus) && file_exists($file_path)) {
+            unlink($file_path);
+        }
+    }
+
+    // Hapus data dari database
+    mysqli_query($koneksi, "DELETE FROM tb_divisi WHERE id_divisi='$id_divisi'") or die(mysqli_error($koneksi));
+
+    // Simpan pesan sukses
+    $_SESSION['alert_message'] = '
+            <div id="alert-2" class="flex items-center p-4 text-[var(--text-success)] rounded-2xl bg-[var(--bg-success)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                    Data berhasil dihapus
+                </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-success)]/30 text-[var(--text-success)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-success)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>';
+    header("Location: divisi.php");
+    exit;
+}
+
+
+// Fungsi sapaan
+function selamatkanWaktu()
+{
+    date_default_timezone_set('Asia/Jakarta');
+    $jam = date("G"); // 0-23
+
+    if ($jam >= 0 && $jam < 12) {
+        return "Selamat Pagi";
+    } elseif ($jam >= 12 && $jam < 15) {
+        return "Selamat Siang";
+    } elseif ($jam >= 15 && $jam < 18) {
+        return "Selamat Sore";
+    } else {
+        return "Selamat Malam";
+    }
+}
+
+// Panggil fungsi
+$sapaan = selamatkanWaktu();
+
+
+?>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aspirasi - Admin Dashboard</title>
+    <title>Divisi - Admin Dashboard</title>
 
     <!-- Flowbite CSS -->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
@@ -52,7 +163,7 @@
             <hr class="borer border-[var(--txt-primary)]/30 mx-2 my-8">
             <ul class="space-y-3 font-medium">
                 <li>
-                    <a href="../dashboard.html"
+                    <a href="../dashboard.php"
                         class="flex items-center px-4 py-2.5 text-[var(--txt-primary)] rounded-xl hover:bg-[var(--bg-secondary3)]/10 group">
                         <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -69,9 +180,9 @@
                 <!-- Kelola Konten -->
                 <li>
                     <button type="button"
-                        class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group bg-transparent hover:bg-[var(--bg-secondary3)]/10"
+                        class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group bg-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/20"
                         aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">
-                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50" aria-hidden="true"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)]" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             viewBox="0 0 24 24">
                             <path fill-rule="evenodd"
@@ -87,7 +198,7 @@
                     </button>
                     <ul id="dropdown-example" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="../kelola-konten/tentang.html"
+                            <a href="tentang.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -102,12 +213,12 @@
                         </li>
 
                         <li>
-                            <a href="../kelola-konten/program.html"
+                            <a href="program.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path
                                         d="M12.8638 3.49613C12.6846 3.18891 12.3557 3 12 3s-.6846.18891-.8638.49613l-3.49998 6c-.18042.30929-.1817.69147-.00336 1.00197S8.14193 11 8.5 11h7c.3581 0 .6888-.1914.8671-.5019.1784-.3105.1771-.69268-.0033-1.00197l-3.5-6ZM4 13c-.55228 0-1 .4477-1 1v6c0 .5523.44772 1 1 1h6c.5523 0 1-.4477 1-1v-6c0-.5523-.4477-1-1-1H4Zm12.5-1c-2.4853 0-4.5 2.0147-4.5 4.5s2.0147 4.5 4.5 4.5 4.5-2.0147 4.5-4.5-2.0147-4.5-4.5-4.5Z" />
                                 </svg>
@@ -116,12 +227,12 @@
                         </li>
 
                         <li>
-                            <a href="../kelola-konten/divisi.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group bg-transparent hover:bg-[var(--bg-secondary3)]/10">
+                            <a href="divisi.php"
+                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group bg-[var(--bg-secondary3)]/20 hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 transition duration-75 text-[var(--txt-primary)]"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd"
                                         d="M8 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4H6Zm7.25-2.095c.478-.86.75-1.85.75-2.905a5.973 5.973 0 0 0-.75-2.906 4 4 0 1 1 0 5.811ZM15.466 20c.34-.588.535-1.271.535-2v-1a5.978 5.978 0 0 0-1.528-4H18a4 4 0 0 1 4 4v1a2 2 0 0 1-2 2h-4.535Z"
                                         clip-rule="evenodd" />
@@ -131,7 +242,7 @@
                         </li>
 
                         <li>
-                            <a href="../kelola-konten/news.html"
+                            <a href="news.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -147,7 +258,7 @@
                         </li>
 
                         <li>
-                            <a href="../kelola-konten/galeri.html"
+                            <a href="galeri.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -185,12 +296,11 @@
                     </button>
                     <ul id="dropdownPortalLomba" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="#"
+                            <a href="../portal-lomba/main-content.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                     <path
                                         d="M3 4.92857C3 3.90506 3.80497 3 4.88889 3H19.1111C20.195 3 21 3.90506 21 4.92857V13h-3v-2c0-.5523-.4477-1-1-1h-4c-.5523 0-1 .4477-1 1v2H3V4.92857ZM3 15v1.0714C3 17.0949 3.80497 18 4.88889 18h3.47608L7.2318 19.3598c-.35356.4243-.29624 1.0548.12804 1.4084.42428.3536 1.05484.2962 1.40841-.128L10.9684 18h2.0632l2.2002 2.6402c.3535.4242.9841.4816 1.4084.128.4242-.3536.4816-.9841.128-1.4084L15.635 18h3.4761C20.195 18 21 17.0949 21 16.0714V15H3Z" />
                                     <path d="M16 12v1h-2v-1h2Z" />
@@ -200,25 +310,24 @@
                         </li>
 
                         <li>
-                            <a href="#"
+                            <a href="../portal-lomba/data-peserta.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    fill="currentColor" viewBox="0 0 24 24">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-person-lines-fill w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                                    viewBox="0 0 16 16">
                                     <path
-                                        d="M10.83 5a3.001 3.001 0 0 0-5.66 0H4a1 1 0 1 0 0 2h1.17a3.001 3.001 0 0 0 5.66 0H20a1 1 0 1 0 0-2h-9.17ZM4 11h9.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-1.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2Zm1.17 6H4a1 1 0 1 0 0 2h1.17a3.001 3.001 0 0 0 5.66 0H20a1 1 0 1 0 0-2h-9.17a3.001 3.001 0 0 0-5.66 0Z" />
+                                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z" />
                                 </svg>
 
-                                <span class="ms-3">S&K</span></a>
+                                <span class="ms-3">Data Peserta</span></a>
                         </li>
 
                         <li>
-                            <a href="#"
+                            <a href="../portal-lomba/atur-form.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd"
                                         d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
                                         clip-rule="evenodd" />
@@ -235,10 +344,10 @@
                 <!-- Interaksi -->
                 <li>
                     <button type="button"
-                        class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer bg-[var(--bg-secondary3)]/30 group hover:bg-[var(--bg-secondary3)]/10 mt-2"
+                        class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group hover:bg-[var(--bg-secondary3)]/10 mt-2"
                         aria-controls="dropdownInteraksi" data-collapse-toggle="dropdownInteraksi">
 
-                        <svg class="w-5 h-5 text-[var(--txt-primary)] group-hover:text-[var(--txt-primary)]"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             fill="currentColor" viewBox="0 0 24 24">
                             <path fill-rule="evenodd"
@@ -254,7 +363,7 @@
                     </button>
                     <ul id="dropdownInteraksi" class="hidden py-2 space-y-2">
                         <li>
-                            <a href="biyouth.html"
+                            <a href="../interaksi/biyouth.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
@@ -269,10 +378,10 @@
                         </li>
 
                         <li>
-                            <a href="aspirasi.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group bg-[var(--bg-secondary3)]/20 hover:bg-[var(--bg-secondary3)]/10">
+                            <a href="../interaksi/aspirasi.php"
+                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
 
-                                <svg class="w-5 h-5 text-[var(--txt-primary)] group-hover:text-[var(--txt-primary)]"
+                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     fill="currentColor" viewBox="0 0 24 24">
                                     <path
@@ -282,39 +391,21 @@
                                 </svg>
                                 <span class="ms-3">Aspirasi</span></a>
                         </li>
-
-                        <li>
-                            <a href="atur-form.html"
-                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-
-                                <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd"
-                                        d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
-                                        clip-rule="evenodd" />
-                                    <path fill-rule="evenodd"
-                                        d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span class="ms-3">Atur Form</span>
-                            </a>
-                        </li>
                     </ul>
                 </li>
 
                 <hr class="border-b border-[var(--txt-primary)]/20 mx-2 my-6">
 
                 <li>
-                    <a href="#"
-                        class="flex items-center px-4 py-2.5 text-[var(--txt-primary)] rounded-xl hover:bg-[var(--bg-secondary3)]/10 group">
+                    <button data-modal-target="modalLogout" data-modal-toggle="modalLogout"
+                        class="flex items-center px-4 py-2.5 text-[var(--txt-primary)] rounded-xl hover:bg-[var(--bg-secondary3)]/10 group w-full cursor-pointer">
                         <svg class="w-5 h-5 text-[var(--txt-primary)]/50 transition duration-75 group-hover:text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2" />
                         </svg>
                         <span class="ms-3">Logout</span>
-                    </a>
+                    </button>
                 </li>
 
             </ul>
@@ -322,17 +413,44 @@
     </aside>
     <!-- Tutup Sidebar -->
 
+    <!-- Modal Logout -->
+    <div id="modalLogout" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-[var(--bg-primary)] rounded-lg shadow-sm">
+                <button type="button" class="absolute top-3 end-2.5 text-[var(--txt-primary)]/50 bg-transparent hover:bg-[var(--txt-primary)]/30 hover:text-[var(--txt-primary)]/80 rounded-xl text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer" data-modal-hide="modalLogout">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+                <div class="p-4 md:p-5 text-center">
+                    <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <h3 class="mb-5 text-lg font-normal text-[var(--txt-primary)]/60">
+                        Yakin ingin Logout?
+                    </h3>
+                    <button data-modal-hide="modalLogout" type="button" class="cursor-pointer py-2.5 px-5 text-sm font-medium text-[var(--txt-primary)] focus:outline-none bg-[var(--bg-secondary3)]/0 rounded-lg border border-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/10 hover:text-[var(--txt-primary)] focus:z-10 ">Cancel</button>
+                    <a type="button" href="../logout.php" data-modal-hide="modalLogout" type="button" class="ms-2 text-[var(--txt-primary2)] bg-[var(--bg-secondary3)]/80 hover:bg-[var(--bg-secondary3)] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content Dashboard -->
     <div class="px-4 md:px-4 lg:px-8 sm:ml-64">
         <div class="grid grid-cols-2 gap-4 mt-6 sm:mt-4">
             <div class="flex items-center justify-start h-10 md:h-20">
                 <h1 class="text-lg md:text-2xl lg:text-2xl font-bold text-[var(--txt-primary2)]">
-                    Interaksi
+                    Kelola Konten
                 </h1>
             </div>
             <div class="flex items-center justify-end h-10 md:h-20">
                 <h1 class="text-end text-md md:text-lg lg:text-xl font-light text-[var(--txt-primary2)]/80">
-                    Selamat Pagi, Admin!
+                    <?php echo $sapaan; ?>,
+                    <?php echo $username; ?>!
                 </h1>
             </div>
         </div>
@@ -341,42 +459,38 @@
 
         <div class="flex flex-col gap-6">
             <h1 class="text-md md:text-lg lg:text-xl xl:text-2xl font-semibold text-[var(--txt-primary2)] text-start">
-                Aspirasi
+                Divisi
             </h1>
+            <?php echo $alert_message; ?>
             <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 sm:gap-10 rounded-2xl">
                 <form class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     <div class="max-w-2xl">
-                        <select id="tujuan"
-                            class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-bg-primary focus:border-bg-primary block w-full px-4 cursor-pointer hover:bg-[var(--bg-primary)]/10 transition duration-300">
-                            <option selected>Semua Tujuan</option>
-                            <option value="belaNegara">OSIS Divisi Bela Negara</option>
-                            <option value="bph">OSIS Divisi BPH (Badan Pengurus Harian)</option>
-                            <option value="budiPekerti">OSIS Divisi Budi Pekerti</option>
-                            <option value="kesehatan">OSIS Divisi Kesehatan</option>
-                            <option value="ketaqwaan">OSIS Divisi Ketaqwaan</option>
-                            <option value="seniora">OSIS Divisi Seniora (Seni dan Olahraga)</option>
-                            <option value="tik">OSIS Divisi TIK (Teknologi Informasi dan Komunikasi)</option>
-                            <option value="pihakSekolah">Pihak Sekolah</option>
-                            <option value="seluruhOsis">Seluruh OSIS</option>
+                        <select id="countries" name="kategori_divisi"
+                            class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-bg-primary focus:border-bg-primary block w-full px-4 cursor-pointer hover:bg-[var(--bg-primary)]/10 transition duration-300" onchange="this.form.submit()">
+                            <option value="">Semua Divisi</option>
+                            <option value=" Bela Negara" <?= ($kategori_divisi == 'Bela Negara') ? 'selected' : '' ?>>Bela Negara</option>
+                            <option value="Ketaqwaan" <?= ($kategori_divisi == 'Ketaqwaan') ? 'selected' : '' ?>>Ketaqwaan</option>
+                            <option value="Budi Pekerti" <?= ($kategori_divisi == 'Minat dan Bakat') ? 'selected' : '' ?>>Budi Pekerti
+                            </option>
+                            <option value="Kesehatan" <?= ($kategori_divisi == 'Kesehatan') ? 'selected' : '' ?>>Kesehatan</option>
+                            <option value="Seniora" <?= ($kategori_divisi == 'Seniora') ? 'selected' : '' ?>>Seniora</option>
+                            <option value="TIK" <?= ($kategori_divisi == 'TIK') ? 'selected' : '' ?>>TIK</option>
                         </select>
                     </div>
-
                     <div class="max-w-2xl">
-                        <select id="countries"
-                            class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-bg-primary focus:border-bg-primary block w-full px-4 cursor-pointer hover:bg-[var(--bg-primary)]/10 transition duration-300">
-                            <option selected>
-                                Semua Waktu
-                            </option>
-                            <option value="US">Terakhir</option>
-                            <option value="CA">Terbaru</option>
+                        <select id="countries" name="urutkan_data"
+                            class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-bg-primary focus:border-bg-primary block w-full px-4 cursor-pointer hover:bg-[var(--bg-primary)]/10 transition duration-300" onchange="this.form.submit()">
+                            <option value="">Urutkan</option>
+                            <option value="terbaru" <?= ($urutkan_data == 'terbaru') ? 'selected' : '' ?>>Terbaru</option>
+                            <option value="terlama" <?= ($urutkan_data == 'terlama') ? 'selected' : '' ?>>Terlama</option>
                         </select>
                     </div>
                     <div class="max-w-2xl flex items-center">
                         <label for="simple-search" class="sr-only">Search</label>
                         <div class="w-full">
-                            <input type="text" id="simple-search"
+                            <input type="text" id="simple-search" name="search"
                                 class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-[var(--txt-primary2)] focus:border-bg-primary block w-full px-4"
-                                placeholder="Cari" required />
+                                placeholder="Cari" value="<?= htmlspecialchars($search) ?>" />
                         </div>
                         <button type="submit"
                             class="p-2.5 md:p-3 ms-2 text-sm font-medium text-[var(--txt-primary)] bg-[var(--bg-primary)] rounded-2xl border border-[var(--txt-primary2)] hover:bg-[var(--bg-primary)]/80 cursor-pointer">
@@ -390,10 +504,10 @@
                     </div>
                 </form>
                 <div class="flex flex-col items-end justify-center">
-                    <button type="button"
+                    <a href="../crud/tambah-divisi.php"
                         class="focus:outline-none text-[var(--txt-primary)] bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-2xl text-md px-5 py-2.5 shadow-lg hover:shadow-none transition duration-300 cursor-pointer">
                         Tambah
-                    </button>
+                    </a>
                 </div>
             </div>
             <div class="flex items-center justify-center mt-4">
@@ -407,10 +521,10 @@
                                     ID
                                 </th>
                                 <th scope="col" class="px-6 py-3">
-                                    Tujuan Aspirasi
+                                    Nama Divisi
                                 </th>
                                 <th scope="col" class="px-6 py-3">
-                                    Komentar
+                                    Gambar
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-end">
                                     Aksi
@@ -418,27 +532,76 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                class="bg-transparent border-b border-[var(--bg-primary)]/20 hover:bg-[var(--bg-primary)]/10">
-                                <th scope="row"
-                                    class="px-6 py-4 font-medium text-[var(--txt-primary2)] whitespace-nowrap">
-                                    1
-                                </th>
-                                <td class="px-6 py-4">
-                                    Divisi Lorem Ipsum
-                                </td>
-                                <td class="px-6 py-4">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsum similique sunt suscipit vero minus recusandae, aliquam numquam animi sapiente necessitatibus.
-                                </td>
-                                <td class="px-6 py-4 text-right space-y-2">
-                                    <a href="#" class="font-medium text-md sm:text-lg text-yellow-600 hover:underline">
-                                        UBAH
-                                    </a>
-                                    <a href="#" class="font-medium text-md lg:text-lg text-red-600 hover:underline">
-                                        HAPUS
-                                    </a>
-                                </td>
-                            </tr>
+
+                            <?php
+                            if ($ambilDivisi && mysqli_num_rows($ambilDivisi) > 0) {
+                                while ($tampilDivisi = mysqli_fetch_array($ambilDivisi)) {
+                            ?>
+
+                                    <tr
+                                        class="bg-transparent border-b border-[var(--bg-primary)]/20 hover:bg-[var(--bg-primary)]/10">
+                                        <th scope="row"
+                                            class="px-6 py-4 font-medium text-[var(--txt-primary2)] whitespace-nowrap">
+                                            <?= htmlspecialchars($tampilDivisi['id_divisi']); ?>
+                                        </th>
+                                        <td class="px-6 py-4">
+                                            <?= htmlspecialchars($tampilDivisi['tagline_divisi']); ?>
+                                        </td>
+                                        <td class="px-6 py-4" width="20%">
+                                            <img src="../../assets/img/divisi/<?= htmlspecialchars($tampilDivisi['img_divisi']); ?>"
+                                                alt="Dummy Img">
+                                        </td>
+                                        <td class="px-6 py-4 text-right space-y-2">
+                                            <a href="../crud/ubah-divisi.php?kode=<?= $tampilDivisi['id_divisi']; ?>" class="font-medium text-md sm:text-lg text-yellow-600 hover:underline">
+                                                UBAH
+                                            </a>
+                                            <button data-modal-target="modalHapusDivisi<?= $tampilDivisi['id_divisi']; ?>" data-modal-toggle="modalHapusDivisi<?= $tampilDivisi['id_divisi']; ?>" class="font-medium text-md lg:text-lg text-red-600 hover:underline">
+                                                HAPUS
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Modal Data - Delete -->
+                                    <div id="modalHapusDivisi<?= $tampilDivisi['id_divisi']; ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                                        <div class="relative p-4 w-full max-w-md max-h-full">
+                                            <div class="relative bg-[var(--bg-primary)] rounded-lg shadow-sm">
+                                                <button type="button" class="absolute top-3 end-2.5 text-[var(--txt-primary)]/50 bg-transparent hover:bg-[var(--txt-primary)]/30 hover:text-[var(--txt-primary)]/80 rounded-xl text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer" data-modal-hide="modalHapusDivisi<?= $tampilDivisi['id_divisi']; ?>">
+                                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                                    </svg>
+                                                    <span class="sr-only">Close modal</span>
+                                                </button>
+                                                <div class="p-4 md:p-5 text-center">
+                                                    <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+                                                    <h3 class="mb-5 text-lg font-normal text-[var(--txt-primary)]/60">
+                                                        Yakin ingin menghapus data ini?
+                                                    </h3>
+                                                    <button data-modal-hide="modalHapusDivisi<?= $tampilDivisi['id_divisi']; ?>" type="button" class="cursor-pointer py-2.5 px-5 text-sm font-medium text-[var(--txt-primary)] focus:outline-none bg-[var(--bg-secondary3)]/0 rounded-lg border border-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/10 hover:text-[var(--txt-primary)] focus:z-10 ">
+                                                        Cancel
+                                                    </button>
+                                                    <a href="divisi.php?kode=<?= $tampilDivisi['id_divisi']; ?>" class="ms-2 text-[var(--txt-primary)] bg-[var(--text-danger)]/80 hover:bg-[var(--text-danger)] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">
+                                                        Hapus
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                <?php
+                                }
+                            } else {
+                                ?>
+                                <tr>
+                                    <td class="px-6 py-8 text-center" colspan="7">
+                                        Tidak ada data yang cocok dengan filter/pencarian/data tidak tersedia.
+                                    </td>
+                                </tr>
+                            <?php
+                            }
+                            ?>
+
                         </tbody>
                     </table>
                 </div>
@@ -476,7 +639,6 @@
                 });
             });
         });
-
     </script>
 
 
