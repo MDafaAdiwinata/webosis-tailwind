@@ -371,7 +371,7 @@ $sapaan = selamatkanWaktu();
                         class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group hover:bg-[var(--bg-secondary3)]/10 mt-2"
                         aria-controls="dropdownInteraksi" data-collapse-toggle="dropdownInteraksi">
 
-                        <svg class="w-5 h-5 text-[var(--txt-primary)] group-hover:text-[var(--txt-primary)]"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             fill="currentColor" viewBox="0 0 24 24">
                             <path fill-rule="evenodd"

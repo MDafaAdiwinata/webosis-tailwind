@@ -169,7 +169,7 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                     <button type="button"
                         class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group hover:bg-[var(--bg-secondary3)]/10 mt-2"
                         aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">
-                        <svg class="w-5 h-5 text-[var(--txt-primary)]" aria-hidden="true"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             viewBox="0 0 24 24">
                             <path fill-rule="evenodd"
@@ -267,7 +267,7 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                     <button type="button"
                         class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group bg-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/20"
                         aria-controls="dropdownPortalLomba" data-collapse-toggle="dropdownPortalLomba">
-                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             fill="currentColor" viewBox="0 0 24 24">
                             <path

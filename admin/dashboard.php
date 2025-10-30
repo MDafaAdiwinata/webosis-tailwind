@@ -363,8 +363,8 @@ $sapaan = selamatkanWaktu();
                     <h3 class="mb-5 text-lg font-normal text-[var(--txt-primary)]/60">
                         Yakin ingin Logout?
                     </h3>
-                    <button data-modal-hide="modalLogout" type="button" class="cursor-pointer py-2.5 px-5 text-sm font-medium text-[var(--txt-primary)] focus:outline-none bg-[var(--bg-secondary3)]/0 rounded-lg border border-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/10 hover:text-[var(--txt-primary)] focus:z-10 ">Cancel</button>
-                    <a type="button" href="logout.php" data-modal-hide="modalLogout" type="button" class="ms-2 text-[var(--txt-primary2)] bg-[var(--bg-secondary3)]/80 hover:bg-[var(--bg-secondary3)] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">
+                    <button data-modal-hide="modalLogout" type="button" class="cursor-pointer py-2.5 px-5 text-sm font-medium text-[var(--txt-primary)] focus:outline-none bg-[var(--bg-secondary3)]/0 rounded-xl border border-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/10 hover:text-[var(--txt-primary)] focus:z-10 ">Cancel</button>
+                    <a type="button" href="logout.php" data-modal-hide="modalLogout" type="button" class="ms-2 text-[var(--txt-primary2)] bg-[var(--bg-secondary3)]/80 hover:bg-[var(--bg-secondary3)] font-medium rounded-xl text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">
                         Logout
                     </a>
                 </div>
@@ -400,7 +400,7 @@ $sapaan = selamatkanWaktu();
                 </h1>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 lg:gap-6">
                     <!-- Card: Total Program -->
-                    <div
+                    <a href="kelola-konten/tentang.php"
                         class="flex flex-col items-center justify-center p-6 bg-[var(--txt-primary)] hover:bg-[var(--bg-primary)]/10 cursor-pointer rounded-xl border border-[var(--bg-primary)]/60 shadow-md hover:shadow-none transition duration-300">
                         <svg class="w-10 h-10 sm:w-15 sm:h-15 text-[#fc355a] mb-3" xmlns="http://www.w3.org/2000/svg"
                             fill="currentColor" viewBox="0 0 24 24">
@@ -411,10 +411,10 @@ $sapaan = selamatkanWaktu();
                         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--txt-primary2)] mt-2">
                             <?= $total_program; ?>
                         </h1>
-                    </div>
+                    </a>
 
                     <!-- Card: Total Divisi -->
-                    <div
+                    <a href="kelola-konten/divisi.php"
                         class="flex flex-col items-center justify-center p-6 bg-[var(--txt-primary)] hover:bg-[var(--bg-primary)]/10 cursor-pointer rounded-xl border border-[var(--bg-primary)]/60 shadow-md hover:shadow-none transition duration-300">
                         <svg class="w-10 h-10 sm:w-15 sm:h-15 text-[#ff824d] mb-3" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -427,10 +427,10 @@ $sapaan = selamatkanWaktu();
                         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--txt-primary2)] mt-2">
                             <?= $total_divisi; ?>
                         </h1>
-                    </div>
+                    </a>
 
                     <!-- Card: Total News -->
-                    <div
+                    <a href="kelola-konten/news.php"
                         class="flex flex-col items-center justify-center p-6 bg-[var(--txt-primary)] hover:bg-[var(--bg-primary)]/10 cursor-pointer rounded-xl border border-[var(--bg-primary)]/60 shadow-md hover:shadow-none transition duration-300">
                         <svg class="w-10 h-10 sm:w-15 sm:h-15 text-[#e4c200] mb-3" xmlns="http://www.w3.org/2000/svg"
                             width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -442,10 +442,10 @@ $sapaan = selamatkanWaktu();
                         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--txt-primary2)] mt-2">
                             <?= $total_news; ?>
                         </h1>
-                    </div>
+                    </a>
 
                     <!-- Card: Total Galeri -->
-                    <div
+                    <a href="kelola-konten/galeri.php"
                         class="flex flex-col items-center justify-center p-6 bg-[var(--txt-primary)] hover:bg-[var(--bg-primary)]/10 cursor-pointer rounded-xl border border-[var(--bg-primary)]/60 shadow-md hover:shadow-none transition duration-300">
                         <svg class="w-10 h-10 sm:w-15 sm:h-15 text-[#2beb71] mb-3" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -458,10 +458,10 @@ $sapaan = selamatkanWaktu();
                         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--txt-primary2)] mt-2">
                             <?= $total_galeri; ?>
                         </h1>
-                    </div>
+                    </a>
 
                     <!-- Card: Total Biyouth Creation -->
-                    <div
+                    <a href="interaksi/biyouth.php"
                         class="flex flex-col items-center justify-center p-6 bg-[var(--txt-primary)] hover:bg-[var(--bg-primary)]/10 cursor-pointer rounded-xl border border-[var(--bg-primary)]/60 shadow-md hover:shadow-none transition duration-300">
                         <svg class="w-10 h-10 sm:w-15 sm:h-15 text-[#6075fc] mb-3" xmlns="http://www.w3.org/2000/svg"
                             width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -475,10 +475,10 @@ $sapaan = selamatkanWaktu();
                         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--txt-primary2)] mt-2">
                             <?= $total_biyouth; ?>
                         </h1>
-                    </div>
+                    </a>
 
                     <!-- Card: Total Forum Aspirasi -->
-                    <div
+                    <a href="interaksi/aspirasi.php"
                         class="flex flex-col items-center justify-center p-6 bg-[var(--txt-primary)] hover:bg-[var(--bg-primary)]/10 cursor-pointer rounded-xl border border-[var(--bg-primary)]/60 shadow-md hover:shadow-none transition duration-300">
                         <svg class="w-10 h-10 sm:w-15 sm:h-15 text-[#ca47fd] mb-3" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
@@ -494,7 +494,7 @@ $sapaan = selamatkanWaktu();
                         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--txt-primary2)] mt-2">
                             <?= $total_forum; ?>
                         </h1>
-                    </div>
+                        </a>
 
                 </div>
             </div>
@@ -503,19 +503,19 @@ $sapaan = selamatkanWaktu();
             <div class="mb-32 xl:mb-0">
                 <h1 class="text-lg md:text-xl lg:text-2xl font-semibold mb-4">Akses Cepat</h1>
                 <div class="flex flex-col gap-2">
-                    <a href=""
+                    <a href="kelola-konten/program.php"
                         class="border border-red-500 text-[var(--txt-primary2)] text-center rounded-2xl py-3 hover:bg-red-100 transition">
                         Tinjau Program Mendatang
                     </a>
-                    <a href=""
+                    <a href="kelola-konten/divisi.php"
                         class="border border-yellow-500 text-[var(--txt-primary2)] text-center rounded-2xl py-3 hover:bg-yellow-100 transition">
                         Kelola Berita
                     </a>
-                    <a href=""
+                    <a href="kelola-konten/galeri.php"
                         class="border border-green-500 text-[var(--txt-primary2)] text-center rounded-2xl py-3 hover:bg-green-100 transition">
                         Ubah Galeri
                     </a>
-                    <a href=""
+                    <a href="interaksi/aspirasi.php"
                         class="border border-blue-500 text-[var(--txt-primary2)] text-center rounded-2xl py-3 hover:bg-blue-100 transition">
                         Tinjau Aspirasi
                     </a>
