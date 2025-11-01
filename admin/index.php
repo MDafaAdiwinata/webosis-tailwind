@@ -150,8 +150,7 @@ if (isset($_POST['login'])) {
                         Password:
                     </label>
                     <input type="password" id="password" name="password"
-                        class="bg-transparent border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]/50 block w-full px-3 py-2.5"
-                        />
+                        class="bg-transparent border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]/50 block w-full px-3 py-2.5" />
                 </div>
                 <button type="submit" name="login"
                     class="mt-4 text-[var(--txt-primary2)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/80 focus:ring-3 focus:outline-none focus:ring-[var(--bg-primary)] font-bold rounded-xl text-lg w-full px-5 py-2 text-center cursor-pointer transition duration-500">

@@ -12,6 +12,13 @@ if (!isset($_SESSION['username'])) {
         ";
 }
 
+// Menyiapkan variabel untuk pesan alert dari session
+$alert_message = '';
+if (isset($_SESSION['alert_message'])) {
+    $alert_message = $_SESSION['alert_message'];
+    unset($_SESSION['alert_message']); // Hapus pesan dari session agar tidak tampil lagi
+}
+
 if (isset($_POST['tambah'])) {
 
     // Ambil dan amankan input
@@ -26,14 +33,44 @@ if (isset($_POST['tambah'])) {
     // Validasi tipe file
     $tipe_valid = ['jpg', 'jpeg', 'png'];
     if (!in_array($ext, $tipe_valid)) {
-        echo "<script>alert('File harus berupa JPG, JPEG, atau PNG');</script>";
+        $_SESSION['alert_message'] = '
+            <div id="alert-2" class="flex items-center p-4 text-[var(--text-danger)] rounded-2xl bg-[var(--bg-danger)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-md font-medium">
+                    File harus berupa JPG, JPEG, atau PNG
+                </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-danger)]/30 text-[var(--text-danger)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-danger)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>';
         header("Location: tambah-galeri.php");
         exit;
     }
 
     // Validasi ukuran file (maks 2MB)
     if ($ukuran_gambar > 2 * 1024 * 1024) {
-        echo "<script>alert('Ukuran file maks 2MB');</script>";
+        $_SESSION['alert_message'] = '
+            <div id="alert-2" class="flex items-center p-4 text-[var(--text-warning)] rounded-2xl bg-[var(--bg-warning)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-md font-medium">
+                    Ukuran file terlalu besar! Maksimal 2MB
+                </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-warning)]/30 text-[var(--text-warning)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-warning)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>';
         header("Location: tambah-galeri.php");
         exit;
     }
@@ -48,10 +85,23 @@ if (isset($_POST['tambah'])) {
       ");
 
     // Simpan pesan sukses ke dalam session
-    echo "<script>
-            alert('Data berhasil ditambahkan');
-            window.location.href = '../kelola-konten/galeri.php';
-        </script>";
+    $_SESSION['alert_message'] = '
+            <div id="alert-2" class="flex items-center p-4 text-[var(--text-success)] rounded-2xl bg-[var(--bg-success)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-md font-medium">
+                    Data berhasil ditambahkan!
+                </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-success)]/30 text-[var(--text-success)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-success)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>';
+    header("Location: ../kelola-konten/galeri.php");
     exit;
 }
 

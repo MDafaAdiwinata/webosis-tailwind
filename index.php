@@ -259,7 +259,7 @@ if (isset($_POST['kirim'])) {
 
           <div class="flex flex-col gap-2 md:gap-4 items-center hover:cursor-pointer">
             <img src="assets/img/divisi/<?= $tampilDivisi['img_divisi'] ?>" alt="Divisi"
-              class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
+              class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500 max-w-[300px]" />
             <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl">
               <?= $tampilDivisi['tagline_divisi']; ?>
             </span>

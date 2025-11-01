@@ -21,3 +21,10 @@ CRUD->Atur Form
 
 <!-- Catetan dari PM Bawel -->
 - tambahin table CRUD data user
+
+// Menyiapkan variabel untuk pesan alert dari session
+$alert_message = '';
+if (isset($_SESSION['alert_message'])) {
+    $alert_message = $_SESSION['alert_message'];
+    unset($_SESSION['alert_message']); // Hapus pesan dari session agar tidak tampil lagi
+}

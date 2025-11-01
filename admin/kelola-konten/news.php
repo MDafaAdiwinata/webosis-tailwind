@@ -67,7 +67,7 @@ if (isset($_GET['kode'])) {
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
             </svg>
             <span class="sr-only">Info</span>
-                <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                <div class="ms-3 me-4 text-md font-medium">
                     Data berhasil dihapus
                 </div>
             <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-success)]/30 text-[var(--text-success)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-success)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
@@ -455,6 +455,7 @@ $sapaan = selamatkanWaktu();
             <h1 class="text-md md:text-lg lg:text-xl xl:text-2xl font-semibold text-[var(--txt-primary2)] text-start">
                 News
             </h1>
+            <?php echo $alert_message; ?>
             <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 sm:gap-10 rounded-2xl">
                 <form class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     <div class="max-w-2xl">
@@ -490,7 +491,7 @@ $sapaan = selamatkanWaktu();
                     </a>
                 </div>
             </div>
-            <div class="flex items-center justify-center mt-4">
+            <div class="flex items-center justify-center mt-4 mb-24">
                 <div
                     class="relative overflow-x-auto rounded-xl sm:rounded-2xl border border-[var(--bg-primary)]/30 w-full">
                     <table class="w-full text-md text-left rtl:text-right text-[var(--txt-primary2)] border-collapse">
