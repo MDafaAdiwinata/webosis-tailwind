@@ -2,8 +2,7 @@
 
 include "../../koneksi.php";
 session_start();
-if ( !isset($_SESSION['username']) )
-{
+if (!isset($_SESSION['username'])) {
     echo "
     <script>
         alert('Silahkan Login Terlebih Dahulu!');
@@ -148,7 +147,6 @@ if (isset($_POST['update_data'])) {
             header("Location: tentang.php");
             exit;
         }
-
     } else {
         // Jika tidak upload gambar baru
         $query = "UPDATE tb_about 
@@ -172,12 +170,13 @@ if (isset($_POST['update_data'])) {
                     </svg>
                 </button>
             </div>';
-            header("Location: tentang.php");
-            exit;
+        header("Location: tentang.php");
+        exit;
     }
 }
 
-function selamatkanWaktu() {
+function selamatkanWaktu()
+{
     date_default_timezone_set('Asia/Jakarta');
     $jam = date("G"); // 0-23
 
@@ -191,9 +190,9 @@ function selamatkanWaktu() {
         return "Selamat Malam";
     }
 }
-  
-  // Memanggil fungsi dan menampilkan hasilnya
-  $sapaan = selamatkanWaktu(); 
+
+// Memanggil fungsi dan menampilkan hasilnya
+$sapaan = selamatkanWaktu();
 
 ?>
 <html lang="en">
@@ -384,17 +383,17 @@ function selamatkanWaktu() {
                         <li>
                             <a href="../portal-lomba/main-content.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-                    
+
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                     <path
                                         d="M3 4.92857C3 3.90506 3.80497 3 4.88889 3H19.1111C20.195 3 21 3.90506 21 4.92857V13h-3v-2c0-.5523-.4477-1-1-1h-4c-.5523 0-1 .4477-1 1v2H3V4.92857ZM3 15v1.0714C3 17.0949 3.80497 18 4.88889 18h3.47608L7.2318 19.3598c-.35356.4243-.29624 1.0548.12804 1.4084.42428.3536 1.05484.2962 1.40841-.128L10.9684 18h2.0632l2.2002 2.6402c.3535.4242.9841.4816 1.4084.128.4242-.3536.4816-.9841.128-1.4084L15.635 18h3.4761C20.195 18 21 17.0949 21 16.0714V15H3Z" />
                                     <path d="M16 12v1h-2v-1h2Z" />
                                 </svg>
-                    
+
                                 <span class="ms-3">Main Content</span></a>
                         </li>
-                    
+
                         <li>
                             <a href="../portal-lomba/data-peserta.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
@@ -404,14 +403,24 @@ function selamatkanWaktu() {
                                     <path
                                         d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z" />
                                 </svg>
-                    
+
                                 <span class="ms-3">Data Peserta</span></a>
                         </li>
-                    
+
+                        <li>
+                            <a href="../portal-lomba/akun-kelas.php"
+                                class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-gear w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" viewBox="0 0 16 16">
+                                    <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4m9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382zM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0" />
+                                </svg>
+
+                                <span class="ms-3">Akun Kelas</span></a>
+                        </li>
+
                         <li>
                             <a href="../portal-lomba/atur-form.php"
                                 class="flex items-center w-full px-4 py-2.5 text-[var(--txt-primary)] transition duration-300 rounded-xl pl-8 group hover:bg-[var(--bg-secondary3)]/10">
-                    
+
                                 <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd"
@@ -535,8 +544,8 @@ function selamatkanWaktu() {
             </div>
             <div class="flex items-center justify-end h-10 md:h-20">
                 <h1 class="text-end text-md md:text-lg lg:text-xl font-light text-[var(--txt-primary2)]/80">
-                <?php echo $sapaan; ?>,
-                <?php echo $username; ?>!
+                    <?php echo $sapaan; ?>,
+                    <?php echo $username; ?>!
                 </h1>
             </div>
         </div>
@@ -602,7 +611,7 @@ function selamatkanWaktu() {
                                         <img src="../../assets/img/<?= $tampilTentang['img_about']; ?>" alt="Image About" class="w-full mb-6">
                                         <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
                                             for="file_input">
-                                            Ubah Gambar (.jpg, .png, .jpeg) 
+                                            Ubah Gambar (.jpg, .png, .jpeg)
                                         </label>
                                         <input
                                             class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"

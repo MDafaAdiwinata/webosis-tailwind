@@ -15,10 +15,6 @@ CRUD->Aspirasi
 Update->Main Content
 CRUD->Atur Form
 
-<!-- Kendala/Blom -->
-- Logic user isi data lomba ke admin
-- CRUD data peserta, dan dinamiskan kolom2 dengan atur form
-
 <!-- Catetan dari PM Bawel -->
 - tambahin table CRUD data user
 

@@ -37,3 +37,11 @@
   background: url(../assets/img/bg-hero.png) no-repeat center;
   background-size: cover;
 }
+
+.password-dots {
+    font-family: 'text-security-disc';
+    -webkit-text-security: disc;
+    -moz-text-security: disc;
+    text-security: disc;
+    letter-spacing: 2px;
+}
