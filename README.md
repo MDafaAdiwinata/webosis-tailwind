@@ -7,8 +7,7 @@ Website Osis SMK Bina Informatika ini adalah website organisasi sekolah yang dib
 
 ## 🪪 Identitas Proyek
 
-**Nama Proyek:** Mercedes Benz Showroom Car <br>
-**Jenis Proyek:** Website Showcase / Showroom Car <br>
+**Nama Proyek:** WEBSITE OSIS SMK BINA INFORMATIKA <br>
 **Teknologi Utama:** <br>
 
 <div align="center">
