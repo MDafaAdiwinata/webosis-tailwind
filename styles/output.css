@@ -784,24 +784,6 @@
   .border-\[var\(--bg-success\)\] {
     border-color: var(--bg-success);
   }
-  .border-\[var\(--bg-w\)\] {
-    border-color: var(--bg-w);
-  }
-  .border-\[var\(--bg-wa\)\] {
-    border-color: var(--bg-wa);
-  }
-  .border-\[var\(--bg-war\)\] {
-    border-color: var(--bg-war);
-  }
-  .border-\[var\(--bg-warn\)\] {
-    border-color: var(--bg-warn);
-  }
-  .border-\[var\(--bg-warni\)\] {
-    border-color: var(--bg-warni);
-  }
-  .border-\[var\(--bg-warnin\)\] {
-    border-color: var(--bg-warnin);
-  }
   .border-\[var\(--bg-warning\)\] {
     border-color: var(--bg-warning);
   }
@@ -874,26 +856,17 @@
       background-color: color-mix(in oklab, var(--bg-danger) 30%, transparent);
     }
   }
-  .bg-\[var\(--bg-i\)\] {
-    background-color: var(--bg-i);
-  }
   .bg-\[var\(--bg-i\)\]\/30 {
     background-color: var(--bg-i);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--bg-i) 30%, transparent);
     }
   }
-  .bg-\[var\(--bg-in\)\] {
-    background-color: var(--bg-in);
-  }
   .bg-\[var\(--bg-in\)\]\/30 {
     background-color: var(--bg-in);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--bg-in) 30%, transparent);
     }
-  }
-  .bg-\[var\(--bg-inf\)\] {
-    background-color: var(--bg-inf);
   }
   .bg-\[var\(--bg-inf\)\]\/30 {
     background-color: var(--bg-inf);
@@ -915,9 +888,6 @@
   }
   .bg-\[var\(--bg-primary\)\] {
     background-color: var(--bg-primary);
-  }
-  .bg-\[var\(--bg-s\)\] {
-    background-color: var(--bg-s);
   }
   .bg-\[var\(--bg-secondary\)\] {
     background-color: var(--bg-secondary);
@@ -970,21 +940,6 @@
       background-color: color-mix(in oklab, var(--bg-secondary3) 80%, transparent);
     }
   }
-  .bg-\[var\(--bg-su\)\] {
-    background-color: var(--bg-su);
-  }
-  .bg-\[var\(--bg-suc\)\] {
-    background-color: var(--bg-suc);
-  }
-  .bg-\[var\(--bg-succ\)\] {
-    background-color: var(--bg-succ);
-  }
-  .bg-\[var\(--bg-succe\)\] {
-    background-color: var(--bg-succe);
-  }
-  .bg-\[var\(--bg-succes\)\] {
-    background-color: var(--bg-succes);
-  }
   .bg-\[var\(--bg-success\)\] {
     background-color: var(--bg-success);
   }
@@ -992,60 +947,6 @@
     background-color: var(--bg-success);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--bg-success) 30%, transparent);
-    }
-  }
-  .bg-\[var\(--bg-w\)\] {
-    background-color: var(--bg-w);
-  }
-  .bg-\[var\(--bg-w\)\]\/30 {
-    background-color: var(--bg-w);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-w) 30%, transparent);
-    }
-  }
-  .bg-\[var\(--bg-wa\)\] {
-    background-color: var(--bg-wa);
-  }
-  .bg-\[var\(--bg-wa\)\]\/30 {
-    background-color: var(--bg-wa);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-wa) 30%, transparent);
-    }
-  }
-  .bg-\[var\(--bg-war\)\] {
-    background-color: var(--bg-war);
-  }
-  .bg-\[var\(--bg-war\)\]\/30 {
-    background-color: var(--bg-war);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-war) 30%, transparent);
-    }
-  }
-  .bg-\[var\(--bg-warn\)\] {
-    background-color: var(--bg-warn);
-  }
-  .bg-\[var\(--bg-warn\)\]\/30 {
-    background-color: var(--bg-warn);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-warn) 30%, transparent);
-    }
-  }
-  .bg-\[var\(--bg-warni\)\] {
-    background-color: var(--bg-warni);
-  }
-  .bg-\[var\(--bg-warni\)\]\/30 {
-    background-color: var(--bg-warni);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-warni) 30%, transparent);
-    }
-  }
-  .bg-\[var\(--bg-warnin\)\] {
-    background-color: var(--bg-warnin);
-  }
-  .bg-\[var\(--bg-warnin\)\]\/30 {
-    background-color: var(--bg-warnin);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--bg-warnin) 30%, transparent);
     }
   }
   .bg-\[var\(--bg-warning\)\] {
@@ -1302,6 +1203,18 @@
   .text-\[var\(\(--txt-primary2\)\)\] {
     color: var((--txt-primary2));
   }
+  .text-\[var\(--bg-i\)\] {
+    color: var(--bg-i);
+  }
+  .text-\[var\(--bg-in\)\] {
+    color: var(--bg-in);
+  }
+  .text-\[var\(--bg-inf\)\] {
+    color: var(--bg-inf);
+  }
+  .text-\[var\(--bg-info\)\] {
+    color: var(--bg-info);
+  }
   .text-\[var\(--bg-secondary\)\] {
     color: var(--bg-secondary);
   }
@@ -1314,56 +1227,11 @@
   .text-\[var\(--text-danger\)\] {
     color: var(--text-danger);
   }
-  .text-\[var\(--text-i\)\] {
-    color: var(--text-i);
-  }
-  .text-\[var\(--text-in\)\] {
-    color: var(--text-in);
-  }
-  .text-\[var\(--text-inf\)\] {
-    color: var(--text-inf);
-  }
   .text-\[var\(--text-info\)\] {
     color: var(--text-info);
   }
-  .text-\[var\(--text-s\)\] {
-    color: var(--text-s);
-  }
-  .text-\[var\(--text-su\)\] {
-    color: var(--text-su);
-  }
-  .text-\[var\(--text-suc\)\] {
-    color: var(--text-suc);
-  }
-  .text-\[var\(--text-succ\)\] {
-    color: var(--text-succ);
-  }
-  .text-\[var\(--text-succe\)\] {
-    color: var(--text-succe);
-  }
-  .text-\[var\(--text-succes\)\] {
-    color: var(--text-succes);
-  }
   .text-\[var\(--text-success\)\] {
     color: var(--text-success);
-  }
-  .text-\[var\(--text-w\)\] {
-    color: var(--text-w);
-  }
-  .text-\[var\(--text-wa\)\] {
-    color: var(--text-wa);
-  }
-  .text-\[var\(--text-war\)\] {
-    color: var(--text-war);
-  }
-  .text-\[var\(--text-warn\)\] {
-    color: var(--text-warn);
-  }
-  .text-\[var\(--text-warni\)\] {
-    color: var(--text-warni);
-  }
-  .text-\[var\(--text-warnin\)\] {
-    color: var(--text-warnin);
   }
   .text-\[var\(--text-warning\)\] {
     color: var(--text-warning);
@@ -1403,9 +1271,6 @@
     @supports (color: color-mix(in lab, red, red)) {
       color: color-mix(in oklab, var(--txt-primary2) 80%, transparent);
     }
-  }
-  .text-blue-600 {
-    color: var(--color-blue-600);
   }
   .text-gray-400 {
     color: var(--color-gray-400);
@@ -1558,6 +1423,46 @@
     &:hover {
       @media (hover: hover) {
         border-color: var(--bg-primary);
+      }
+    }
+  }
+  .hover\:bg-\[var\(--bg-i\)\]\/0 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--bg-i);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--bg-i) 0%, transparent);
+        }
+      }
+    }
+  }
+  .hover\:bg-\[var\(--bg-in\)\]\/0 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--bg-in);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--bg-in) 0%, transparent);
+        }
+      }
+    }
+  }
+  .hover\:bg-\[var\(--bg-inf\)\]\/0 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--bg-inf);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--bg-inf) 0%, transparent);
+        }
+      }
+    }
+  }
+  .hover\:bg-\[var\(--bg-info\)\]\/0 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--bg-info);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--bg-info) 0%, transparent);
+        }
       }
     }
   }
@@ -1859,13 +1764,6 @@
     &:hover {
       @media (hover: hover) {
         color: var(--txt-primary2);
-      }
-    }
-  }
-  .hover\:text-blue-800 {
-    &:hover {
-      @media (hover: hover) {
-        color: var(--color-blue-800);
       }
     }
   }

@@ -105,7 +105,8 @@ if (isset($_POST['kirim'])) {
 <body class="font-[poppins]">
     <!-- Navbar -->
 
-    <nav class="bg-[var(--bg-primary)] fixed top-0 left-0 right-0 z-50 transition duration-500">
+    <nav class="bg-[var(--bg-primary)] fixed top-0 left-0 right-0 z-50 transition duration-500" data-aos="fade-down" data-aos-duration="1500"
+        data-aos-delay="3000">
         <div class="flex flex-wrap items-center justify-between mx-auto p-4 md:p-6 lg:px-10 lg:py-8">
             <a href="" class="flex items-center space-x-3 rtl:space-x-reverse">
                 <img src="../assets/img/logo-osis.png" class="h-10 md:h-10 lg:h-15" alt="Flowbite Logo" />
@@ -149,31 +150,38 @@ if (isset($_POST['kirim'])) {
 
     <section id="heroSectionPortalLomba" class="flex flex-col items-center bg-[var(--bg-secondary3)]">
         <div class="px-4 container mx-auto pt-52">
-            <h2 class="text-xl md:text-2xl lg:text-3xl text-center underline text-[var(--txt-primary2)]">
+            <h2 class="text-xl md:text-2xl lg:text-3xl text-center underline text-[var(--txt-primary2)]" data-aos="fade-down"
+                data-aos-duration="1000">
                 Halo <?php echo $username; ?>! Selamat Datang di,
             </h2>
-            <h1 class="text-2xl md:text-4xl lg:text-6xl text-center my-4 md:my-8 text-[var(--bg-secondary2)] font-bold">
+            <h1 class="text-2xl md:text-4xl lg:text-6xl text-center my-4 md:my-8 text-[var(--bg-secondary2)] font-bold" data-aos="zoom-in" data-aos-duration="1500"
+                data-aos-delay="1000">
                 <?= $tampilMain['judul_portal']; ?>
             </h1>
             <p
-                class="text-md md:text-xl lg:text-2xl text-justify text-[var(--txt-primary2)] w-full lg:w-3/4 mx-auto leading-6 md:leading-8 lg:leading-11 font-light">
+                class="text-md md:text-xl lg:text-2xl text-justify text-[var(--txt-primary2)] w-full lg:w-3/4 mx-auto leading-6 md:leading-8 lg:leading-11 font-light" data-aos="fade-up" data-aos-duration="1000"
+                data-aos-delay="2000">
                 <?= $tampilMain['deskripsi']; ?>.
             </p>
             <div class="flex flex-col lg:flex-row items-center justify-center mt-12 gap-4 lg:gap-10">
                 <a href="<?= $tampilMain['link_teknis']; ?>"
-                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank">
+                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank" data-aos="fade-up" data-aos-duration="500"
+                    data-aos-delay="1500">
                     TEKNIS LOMBA
                 </a>
                 <a href="<?= $tampilMain['link_reels']; ?>"
-                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank">
+                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank" data-aos="fade-up" data-aos-duration="500"
+                    data-aos-delay="2000">
                     REELS INFORMASI LOMBA
                 </a>
                 <a href="<?= $tampilMain['link_contact']; ?>"
-                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank">
+                    class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank" data-aos="fade-up" data-aos-duration="500"
+                    data-aos-delay="2500">
                     CONTACT PERSON
                 </a>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mt-12 md:mt-18 mb-32 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mt-12 md:mt-18 mb-32 gap-4" data-aos="fade-up" data-aos-duration="1000"
+                data-aos-delay="3000">
                 <img src="../assets/img/galeri/<?= $tampilMain['gambar_1']; ?>"
                     class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
                     alt="Galeri" />
@@ -198,12 +206,14 @@ if (isset($_POST['kirim'])) {
         <div class="px-4 container mx-auto py-20">
 
             <h1
-                class="w-fit text-xl font-bold text-center text-[var(--txt-primary2)] md:text-2xl lg:text-4xl bg-[var(--bg-secondary3)] py-2 md:py-4 px-12 mx-auto rounded-3xl shadow-lg">
+                class="w-fit text-xl font-bold text-center text-[var(--txt-primary2)] md:text-2xl lg:text-4xl bg-[var(--bg-secondary3)] py-2 md:py-4 px-12 mx-auto rounded-3xl shadow-lg" data-aos="zoom-in-down"
+                data-aos-duration="1000">
                 SYARAT DAN KETENTUAN
             </h1>
             <p
                 class="w-full lg:w-3/4 mx-auto text-md md:text-xl mt-8 md:mt-12 bg-[var(--bg-secondary3)] p-8 md:px-8 md:py-8 lg:px-12 lg:py-8 xl:px-18 xl:py-10 rounded-3xl leading-6 md:leading-10 font-light shadow-xl">
-                <span class="font-bold text-lg md:text-2xl">📌 Ketentuan Pengisian Formulir:</span><br>
+                <span class="font-bold text-lg md:text-2xl" data-aos="fade-up"
+                    data-aos-duration="1000" data-aos-delay="300">📌 Ketentuan Pengisian Formulir:</span><br>
                 1. Peserta adalah Siswa dan Siswi SMK Bina Informatika <br>
                 2. Isi data peserta lomba dengan lengkap dan benar. <br>
                 3. Pastikan nomor HP dan email aktif untuk keperluan konfirmasi. <br>
@@ -239,7 +249,8 @@ if (isset($_POST['kirim'])) {
                     <?php unset($_SESSION['success_message']); ?>
                 </div>
             <?php endif; ?>
-            <form class="max-w-6xl flex flex-col justify-center mx-auto" method="POST" action="">
+            <form class="max-w-6xl flex flex-col justify-center mx-auto" method="POST" action="" data-aos="zoom-in-down"
+                data-aos-duration="1000">
                 <label for="kelas" class="block text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
                     Kelas
                 </label>
@@ -353,6 +364,15 @@ if (isset($_POST['kirim'])) {
     <!-- Flowbite Script -->
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 
+    <!-- AOS -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            // Sesuaikan pengaturan global AOS di sini
+            duration: 1000, // Durasi animasi dalam ms
+            once: true, // Animasi hanya berjalan sekali
+        });
+    </script>
 </body>
 
 </html>

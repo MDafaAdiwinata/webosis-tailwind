@@ -3,21 +3,26 @@
 session_start();
 include '../koneksi.php';
 
-$alert = "";
+// Menyiapkan variabel untuk pesan alert dari session
+$alert_message = '';
+if (isset($_SESSION['alert_message'])) {
+    $alert_message = $_SESSION['alert_message'];
+    unset($_SESSION['alert_message']);
+}
 
 if (isset($_POST['login'])) {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
     if ($username == "" || $password == "") {
-        $alert = '
+        $_SESSION['alert_message'] = '
         <div id="alert-2" class="flex items-center p-4 text-[var(--text-warning)] rounded-2xl bg-[var(--bg-warning)]" role="alert">
             <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
             </svg>
             <span class="sr-only">Info</span>
                 <div class="ms-3 me-4 text-sm md:text-md font-medium">
-                    Username atau Password tidak boleh Kosong!
+                    Username atau Password <br> tidak boleh Kosong!
                 </div>
             <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-secondary)]/30 text-[var(--bg-secondary)] rounded-lg cursor-pointer focus:ring-2 p-1.5 hover:bg-[var(--bg-secondary)]/0 transition duration-300 border border-[var(--bg-secondary)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
                     <span class="sr-only">Close</span>
@@ -26,6 +31,8 @@ if (isset($_POST['login'])) {
                 </svg>
             </button>
         </div>';
+        header("Location: index.php");
+        exit;
     } else {
         // Mengamankan input dan membuat query case-sensitive
         $username_secure = mysqli_real_escape_string($koneksi, $username);
@@ -41,7 +48,7 @@ if (isset($_POST['login'])) {
                   window.location.href = 'portal-lomba.php';
                 </script>";
             } else {
-                $alert = '<div id="alert-3" class="flex items-center p-4 text-[var(--text-danger)] rounded-2xl bg-[var(--bg-danger)]" role="alert">
+                $_SESSION['alert_message'] = '<div id="alert-3" class="flex items-center p-4 text-[var(--text-danger)] rounded-2xl bg-[var(--bg-danger)]" role="alert">
             <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
             </svg>
@@ -50,17 +57,21 @@ if (isset($_POST['login'])) {
                    Password Salah!
                 </div>
         </div>';
+                header("Location: index.php");
+                exit;
             }
         } else {
-            $alert = '<div id="alert-3" class="flex items-center p-4 text-[var(--text-info)] rounded-2xl border border-[var(--border-info)] bg-[var(--bg-info)]" role="alert">
+            $_SESSION['alert_message'] = '<div id="alert-3" class="flex items-center p-4 text-[var(--text-info)] rounded-2xl border border-[var(--border-info)] bg-[var(--bg-info)]" role="alert">
             <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
             </svg>
             <span class="sr-only">Info</span>
                 <div class="ms-3 me-4 text-sm md:text-md font-medium">
-                   Username tidak Di temukan
+                   Username tidak ditemukan <br> atau belum terdaftar
                 </div>
         </div>';
+            header("Location: index.php");
+            exit;
         }
     }
 }
@@ -151,11 +162,14 @@ if (isset($_POST['login'])) {
                     </h1>
                 </div>
                 <div class="mb-6">
+                    <?php if ($alert_message != "") echo $alert_message; ?>
+                </div>
+                <div class="mb-6">
                     <label for="username" class="block mb-2 text-sm sm:text-md md:text-lg font-medium text-[var(--txt-primary2)]">
                         Username:
                     </label>
                     <input type="text" id="username"
-                        class="bg-transparent border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]/50 block w-full px-3 py-2.5" name="username" required />
+                        class="bg-transparent border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]/50 block w-full px-3 py-2.5" name="username" />
                 </div>
                 <div class="mb-5">
                     <label for="password" class="block mb-2 text-sm sm:text-md md:text-lg font-medium text-[var(--txt-primary2)]">
@@ -163,7 +177,7 @@ if (isset($_POST['login'])) {
                     </label>
                     <input type="password" id="password" name="password"
                         class="bg-transparent border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]/50 block w-full px-3 py-2.5"
-                        required />
+                     />
                 </div>
                 <button type="submit" name="login"
                     class="mt-4 text-[var(--txt-primary2)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/80 focus:ring-3 focus:outline-none focus:ring-[var(--bg-primary)] font-bold rounded-xl text-lg w-full px-5 py-2 text-center cursor-pointer transition duration-500">

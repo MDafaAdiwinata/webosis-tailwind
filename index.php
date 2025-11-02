@@ -75,7 +75,8 @@ if (isset($_POST['kirim'])) {
 <body class="font-[poppins]">
   <!-- Navbar -->
 
-  <nav class="bg-transparent fixed top-0 left-0 right-0 z-50 transition duration-500">
+  <nav class="bg-transparent fixed top-0 left-0 right-0 z-50 transition duration-500" data-aos="fade-down" data-aos-duration="1500"
+    data-aos-delay="3000">
     <div class="flex flex-wrap items-center justify-between mx-auto p-4 md:p-6 lg:px-10 lg:py-8">
       <a href="" class="flex items-center space-x-3 rtl:space-x-reverse">
         <img src="assets/img/logo-osis.png" class="h-10 md:h-15 lg:h-20" alt="Flowbite Logo" />
@@ -132,13 +133,16 @@ if (isset($_POST['kirim'])) {
   <section id="heroSection"
     class="flex items-center justify-center h-[60vh] md:h-screen bg-[url('/assets/img/bg-hero.jpg')] bg-cover bg-center">
     <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
-      <h1 class="mb-2 text-xl font-semibold md:text-2xl lg:text-4xl text-[var(--txt-primary)]" data-aos="slide-right" data-aos-delay="100">
+      <h1 class="mb-2 text-xl font-semibold md:text-2xl lg:text-4xl text-[var(--txt-primary)]" data-aos="fade-down"
+        data-aos-duration="1000">
         Welcome To
       </h1>
-      <h1 class="text-2xl font-bold md:text-5xl lg:text-6xl text-[var(--txt-primary)]" data-aos="slide-left" data-aos-delay="100">
+      <h1 class="text-2xl font-bold md:text-5xl lg:text-6xl text-[var(--txt-primary)]" data-aos="zoom-in" data-aos-duration="1500"
+        data-aos-delay="1000">
         OSIS SMK BINA INFORMATIKA
       </h1>
-      <h1 class="mt-2 text-xl font-semibold md:text-2xl lg:text-4xl text-[var(--txt-primary)]" data-aos="fade-up" data-aos-delay="100">
+      <h1 class="mt-2 text-xl font-semibold md:text-2xl lg:text-4xl text-[var(--txt-primary)]" data-aos="fade-up" data-aos-duration="1000"
+        data-aos-delay="2000">
         Official Website
       </h1>
     </div>
@@ -155,14 +159,14 @@ if (isset($_POST['kirim'])) {
       while ($tampilTentang = mysqli_fetch_array($ambilTentang)) {
       ?>
 
-        <div class="flex flex-col w-full bg-[var(--bg-secondary3)] p-4 md:p-6 rounded-2xl md:rounded-3xl" data-aos="fade-up" data-aos-delay="100">
+        <div class="flex flex-col w-full bg-[var(--bg-secondary3)] p-4 md:p-6 rounded-2xl md:rounded-3xl" data-aos="fade-up" data-aos-delay="300">
           <h1 class="font-bold text-xl md:text-2xl lg:text-4xl text-center md:text-start ms-0 md:ms-5">
             <?= $tampilTentang['head_about']; ?>
           </h1>
         </div>
 
         <div
-          class="grid grid-cols-1 xl:grid-cols-2 mt-6 md:mt-10 w-full bg-[var(--bg-secondary3)] p-6 md:p-14 rounded-2xl md:rounded-3xl gap-8 xl:gap-20" data-aos="slide-up" data-aos-delay="100">
+          class="grid grid-cols-1 xl:grid-cols-2 mt-6 md:mt-10 w-full bg-[var(--bg-secondary3)] p-6 md:p-14 rounded-2xl md:rounded-3xl gap-8 xl:gap-20" data-aos="slide-up" data-aos-delay="500">
           <div class="flex flex-col">
             <img src="assets/img/<?= $tampilTentang['img_about']; ?>" alt="Image About Us" />
             <p class="text-xl lg:text-2xl font-bold mt-4">
@@ -188,18 +192,20 @@ if (isset($_POST['kirim'])) {
 
   <section id="about-us" class="bg-[var(--bg-secondary)] text-[var(--txt-primary2)]">
     <div class="container mx-auto py-14 md:py-24 px-6">
-      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl" data-aos="fade-down" data-aos-delay="100">
+      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl" data-aos="zoom-in-down"
+        data-aos-duration="1000">
         PROGRAM MENDATANG
       </h1>
       <p
-        class="text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full md:w-10/12 mx-auto leading-6 md:leading-10" data-aos="fade-right" data-aos-delay="120">
+        class=" text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full md:w-10/12 mx-auto leading-6 md:leading-10" data-aos="fade-up"
+        data-aos-duration="1000" data-aos-delay="300">
         Dengan dukungan OSIS, SMK Bina Informatika hadir dengan
         program-program terbaik untuk mengembangkan potensi, memberikan
         pengalaman yang seru, dan membantu peserta didik agar siap menghadapi
         masa depan!
       </p>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-10 md:gap-20 mt-10 md:mt-20" data-aos="slide-right" data-aos-delay="100">
+      <div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-10 md:gap-20 mt-10 md:mt-20">
 
         <!-- Perulangan Logic Promdat -->
         <?php
@@ -209,7 +215,7 @@ if (isset($_POST['kirim'])) {
         ?>
 
           <div
-            class="flex flex-col item-center justify-center p-4 md:p-8 rounded-2xl md:rounded-4xl bg-[var(--bg-secondary3)] shadow-lg hover:bg-[var(--bg-secondary3)]/60 hover:cursor-pointer border-2 border-[var(--txt-primary)] transition duration-300 hover:shadow-none">
+            class="flex flex-col item-center justify-center p-4 md:p-8 rounded-2xl md:rounded-4xl bg-[var(--bg-secondary3)] shadow-lg hover:bg-[var(--bg-secondary3)]/60 hover:cursor-pointer border-2 border-[var(--txt-primary)] transition duration-300 hover:shadow-none" data-aos="fade-up" data-aos-duration="800">
             <img src="assets/img/promdat/<?= $tampilPromdat['img_card']; ?>" alt="Program Mendatang 1" class="mb-4 rounded-2xl" />
             <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-start">
               <?= $tampilPromdat['judul_card']; ?>
@@ -239,17 +245,19 @@ if (isset($_POST['kirim'])) {
 
   <section id="about-us" class="bg-[var(--bg-primary)] text-[var(--bg-secondary3)]">
     <div class="container mx-auto py-14 md:py-34 px-6">
-      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl" data-aos="fade-down" data-aos-delay="100">
+      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl" data-aos="zoom-in-down"
+        data-aos-duration="1000">
         DIVISI
       </h1>
       <p
-        class="text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full lg:w-1/2 mx-auto leading-6 md:leading-10" data-aos="fade-right" data-aos-delay="100">
+        class="text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full lg:w-1/2 mx-auto leading-6 md:leading-10" data-aos="fade-up"
+        data-aos-duration="1000" data-aos-delay="300">
         Divisi OSIS SMK Bina Informatika hadir dengan program-program terbaik
         Klik untuk mempelajari lebih lanjut mengenai divisi kami!
       </p>
 
       <div
-        class="grid lg:flex flex-wrap justify-center grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-20 mt-12 md:mt-20" data-aos="fade-down-right" data-aos-delay="140">
+        class="grid lg:flex flex-wrap justify-center grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-20 mt-12 md:mt-20">
 
         <!-- Perulangan Logic - Divisi -->
         <?php
@@ -258,7 +266,7 @@ if (isset($_POST['kirim'])) {
 
         ?>
 
-          <div class="flex flex-col gap-2 md:gap-4 items-center hover:cursor-pointer">
+          <div class="flex flex-col gap-2 md:gap-4 items-center hover:cursor-pointer" data-aos="flip-up" data-aos-duration="800">
             <img src="assets/img/divisi/<?= $tampilDivisi['img_divisi'] ?>" alt="Divisi"
               class="w-full bg-[var(--bg-secondary3)] p-3 md:p-10 rounded-2xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500" />
             <span class="font-bold text-center text-sm sm:text-xl md:text-2xl lg:text-4xl">
@@ -282,11 +290,12 @@ if (isset($_POST['kirim'])) {
 
   <section id="about-us" class="bg-[var(--bg-secondary2)] text-[var(--bg-secondary3)]">
     <div class="container mx-auto py-14 md:py-34 px-6">
-      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl" data-aos="fade-down" data-aos-delay="100">
+      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl" data-aos="zoom-in-down" data-aos-duration="800">
         BISmart NEWS
       </h1>
       <p
-        class="text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full lg:w-[80%] mx-auto leading-6 md:leading-10 mb-12 xl:mb-0" data-aos="slide-right" data-aos-delay="100">
+        class="text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full lg:w-[80%] mx-auto leading-6 md:leading-10 mb-12 xl:mb-0" data-aos="fade-up"
+        data-aos-duration="800" data-aos-delay="500">
         Tetap terhubung dengan berita terbaru, cerita inspiratif, dan update
         menarik dari OSIS SMK Bina Informatika! Kami menghadirkan informasi
         terkini seputar kegiatan sekolah, prestasi siswa, dan berbagai event
@@ -294,7 +303,8 @@ if (isset($_POST['kirim'])) {
       </p>
 
       <!-- Carousel -->
-      <div id="default-carousel" class="relative w-full" data-carousel="slide" data-aos="slide-left" data-aos-delay="100">
+      <div id="default-carousel" class="relative w-full" data-carousel="slide" data-aos="zoom-in"
+        data-aos-duration="800" data-aos-delay="500">
         <!-- Carousel wrapper -->
         <div class="relative h-56 sm:h-72 md:h-96 lg:h-[32rem] xl:h-screen overflow-hidden rounded-lg">
 
@@ -354,11 +364,12 @@ if (isset($_POST['kirim'])) {
 
   <section id="galeri" class="bg-[var(--bg-secondary)] text-[var(--txt-primary2)]">
     <div class="container mx-auto py-14 md:py-34 px-6">
-      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl" data-aos="slide-left" data-aos-delay="100">
+      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl" data-aos="fade-up" data-aos-duration="800">
         GALERI
       </h1>
       <p
-        class="text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full lg:w-[80%] mx-auto leading-6 md:leading-10" data-aos="slide-right" data-aos-delay="100">
+        class="text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full lg:w-[80%] mx-auto leading-6 md:leading-10" data-aos="zoom-in-down"
+        data-aos-duration="800" data-aos-delay="500">
         Kumpulan potret seru perjalanan OSIS SMK Bina Informatika! Jelajahi momen-momen berharga dari berbagai kegiatan,
         mulai
         dari program unggulan, acara sekolah, hingga keseruan di balik layar.
@@ -373,7 +384,7 @@ if (isset($_POST['kirim'])) {
 
           <img src="assets/img/galeri/<?= $tampilLandscape['img_galeri']; ?>"
             class="p-3 sm:p-4 md:p-4 lg:p-6 xl:p-8 bg-[var(--bg-secondary3)] rounded-xl md:rounded-4xl hover:bg-[var(--bg-secondary3)]/40 transition duration-500 border-2 border-[var(--bg-secondary3)] cursor-pointer hover:scale-101"
-            alt="Galeri Landscape 1">
+            alt="Galeri Landscape 1" data-aos="fade-up" data-aos-duration="800">
 
         <?php
         }
@@ -407,26 +418,29 @@ if (isset($_POST['kirim'])) {
 
   <section id="forumAspirasi" class="bg-[var(--bg-secondary3)] text-[var(--txt-primary2)]">
     <div class="container mx-auto py-14 md:py-34 px-6">
-      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl text-[var(--bg-secondary2)]" data-aos="fade-down" data-aos-delay="100">
+      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl text-[var(--bg-secondary2)]" data-aos="zoom-in-down"
+        data-aos-duration="800">
         FORUM ASPIRASI
       </h1>
       <p
-        class="text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full lg:w-[80%] mx-auto leading-6 md:leading-10" data-aos="slide-left" data-aos-delay="100">
+        class="text-justify md:text-center text-md md:text-xl mt-4 lg:mt-8 w-full lg:w-[80%] mx-auto leading-6 md:leading-10" data-aos="fade-up" data-aos-duration="800"
+        data-aos-delay="500">
         Kami selalu terbuka untuk masukan! Berikan saran, ide, harapan atau kritik Anda agar OSIS SMK Bina Informatika
         bisa
         terus berkembang dan menghadirkan program terbaik bagi seluruh Peserta DIdik.
       </p>
 
       <img src="assets/img/forum-aspirasi-img.png"
-        class="mx-auto bg-[var(--bg-secondary)] p-4 sm:p-5 md:p-6 lg:p-10 mt-12 rounded-2xl md:rounded-4xl border-2 border-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/50 cursor-pointer transition duration-500 w-full" data-aos="slide-up" data-aos-delay="100"
+        class="mx-auto bg-[var(--bg-secondary)] p-4 sm:p-5 md:p-6 lg:p-10 mt-12 rounded-2xl md:rounded-4xl border-2 border-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/50 cursor-pointer transition duration-500 w-full" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="1000"
         alt="Forum Aspirasi Image">
 
-      <h1 class="font-bold text-[var(--txt-primary2)] text-lg md:text-xl lg:text-3xl mt-8 md:mt-12">Ditujukan ke...</h1>
+      <h1 class="font-bold text-[var(--txt-primary2)] text-lg md:text-xl lg:text-3xl mt-8 md:mt-12" data-aos="zoom-in-down" data-aos-duration="800">Ditujukan ke...</h1>
 
       <form class="w-full mx-auto" action="" method="POST">
         <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         </label>
-        <select id="tujuanForumAspirasi" name="tujuan_aspirasi"
+        <select id="tujuanForumAspirasi" name="tujuan_aspirasi" data-aos="fade-up" data-aos-duration="800"
+          data-aos-delay="500"
           class="bg-[var(--bg-secondary)] border border-[var(--bg-primary)] text-gray-900 text-md md:text-lg rounded-2xl md:rounded-3xl block w-full  px-6 md:px-8 py-2 md:py-4 mt-4 hover:cursor-pointer hover:bg-[var(--bg-secondary)]/60 transition duration-500">
           <option value="">Semua Tujuan</option>
           <option value="OSIS Divisi Bela Negara">OSIS Divisi Bela Negara</option>
@@ -442,15 +456,16 @@ if (isset($_POST['kirim'])) {
         </select>
 
         <div class="mt-8 md:mt-12">
-          <label for="message" class="block mb-4 font-bold text-[var((--txt-primary2))] text-lg md:text-xl lg:text-3xl">
+          <label for="message" class="block mb-4 font-bold text-[var((--txt-primary2))] text-lg md:text-xl lg:text-3xl" data-aos="zoom-in-down" data-aos-duration="800">
             Aspirasi / Saran / Kritik (max. 300 words)
           </label>
-          <textarea id="message" rows="4" name="komentar_forum"
+          <textarea id="message" rows="4" name="komentar_forum" data-aos="zoom-in-down" data-aos-delay="500" data-aos-duration="800"
             class="block p-3 md:p-4 w-full text-md md:text-xl text-[var(--txt-primary2)] bg-white rounded-2xl md:rounded-3xl border border-[var(--bg-primary)]/50 focus:ring-[var(--bg-primary)]/20 focus:border-[var(--bg-primary)]"
             placeholder="Berikan aspirasi, saran, atau kritikmu di kolom ini. Pastikan menggunakan bahasa yang sopan, ya!"></textarea>
         </div>
 
-        <button type="submit" name="kirim"
+        <button type="submit" name="kirim" data-aos="flip-up"
+          data-aos-duration="800" data-aos-delay="1000"
           class="text-[var(--txt-primary)] bg-[var(--bg-secondary2)] hover:bg-[var(--bg-secondary2)]/90 focus:ring-3 focus:outline-none focus:ring-[var(--bg-secondary)] font-bold rounded-xl text-md md:text-lg w-full px-5 py-2.5 text-center mt-6 cursor-pointer transition duration-500 shadow-md">
           Kirim
         </button>
@@ -464,10 +479,12 @@ if (isset($_POST['kirim'])) {
   <!-- Biyouth Creation -->
   <section id="biyouth-creation" class="bg-[var(--bg-secondary2)] text-[var(--txt-primary)]">
     <div class="container mx-auto py-14 md:py-34 px-6">
-      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl text-[var(--txt-primary)]">
+      <h1 class="font-bold text-center text-2xl md:text-5xl lg:text-6xl text-[var(--txt-primary)]" data-aos="zoom-in-down"
+        data-aos-duration="800">
         BIYOUTH CREATION
       </h1>
-      <p class="text-justify md:text-center text-base md:text-xl mt-4 lg:mt-8 w-full mx-auto leading-6 md:leading-10">
+      <p class="text-justify md:text-center text-base md:text-xl mt-4 lg:mt-8 w-full mx-auto leading-6 md:leading-10" data-aos="fade-up" data-aos-duration="800"
+        data-aos-delay="500">
         BIYOUTH CREATION adalah wadah untuk menampilkan karya terbaik peserta didik SMK Bina Informatika. Submit karyamu
         melalui
         email: osisbph2526@gmail.com dengan subject Nama_Kelas_Judul Karya_BIYOUTH CREATION. Kami tunggu karya
@@ -482,7 +499,7 @@ if (isset($_POST['kirim'])) {
         while ($tampilBiyouth = mysqli_fetch_array($ambilBiyouth)) {
         ?>
 
-          <div class="flex flex-col gap-4 md:gap-6 items-center hover:cursor-pointer">
+          <div class="flex flex-col gap-4 md:gap-6 items-center hover:cursor-pointer" data-aos="fade-up" data-aos-duration="800">
             <img src="assets/img/biyouth_creation/<?= $tampilBiyouth['gambar_biyouth'] ?>" alt="Divisi"
               class="w-full bg-[var(--bg-secondary3)] p-4 sm:p-6 md:p-8 rounded-xl md:rounded-2xl hover:bg-[var(--bg-secondary3)]/60 border-2 border-[var(--bg-secondary3)] transition duration-500 shadow-lg" />
             <div
@@ -584,7 +601,7 @@ if (isset($_POST['kirim'])) {
     AOS.init({
       // Sesuaikan pengaturan global AOS di sini
       duration: 1000, // Durasi animasi dalam ms
-      once: false, // Animasi hanya berjalan sekali
+      once: true, // Animasi hanya berjalan sekali
     });
   </script>
 </body>
