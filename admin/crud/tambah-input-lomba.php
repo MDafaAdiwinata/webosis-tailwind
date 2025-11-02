@@ -16,39 +16,51 @@ if (!isset($_SESSION['username'])) {
 $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Unknown';
 
 // Tambah Data
-
-// Tambah Data
 if (isset($_POST['tambah'])) {
-    $nama = $_POST['nama_lomba'];
-    $label = $_POST['label_lomba'];
-    $jenis = $_POST['jenis_input'];
+    $nama = mysqli_real_escape_string($koneksi, $_POST['nama_lomba']);
+    $label = mysqli_real_escape_string($koneksi, $_POST['label_lomba']);
+    $jenis = mysqli_real_escape_string($koneksi, $_POST['jenis_input']);
+    $status = mysqli_real_escape_string($koneksi, $_POST['status']);
+    $emoji = mysqli_real_escape_string($koneksi, $_POST['emoji']);
+
+    // Validasi input
+    if (empty($nama) || empty($label) || empty($jenis) || empty($status) || empty($emoji)) {
+        $_SESSION['alert_message'] = "❌ Semua field harus diisi!";
+        header("Location: ../portal-lomba/atur-form.php");
+        exit;
+    }
 
     // 1. SIMPAN ke tb_input_lomba
     $query1 = mysqli_query($koneksi, "INSERT INTO tb_input_lomba 
-        (nama_lomba, label_lomba, jenis_input, status) 
-        VALUES ('$nama', '$label', '$jenis', 'aktif')");
+        (nama_lomba, label_lomba, jenis_input, status, emoji) 
+        VALUES ('$nama', '$label', '$jenis', '$status', '$emoji')");
 
     if ($query1) {
         // 2. Dapatkan ID baru
         $id_baru = mysqli_insert_id($koneksi);
 
-        // 3. Buat nama kolom
+        // 3. Buat nama kolom yang unik
         $nama_kolom = "input_" . $id_baru;
 
-        // 4. Buat kolom di tb_jawaban_lomba
+        // 4. Buat kolom di tb_jawaban_lomba berdasarkan jenis input
         if ($jenis == 'number') {
-            $query2 = mysqli_query($koneksi, "ALTER TABLE tb_jawaban_lomba ADD $nama_kolom INT NULL");
+            $query2 = mysqli_query($koneksi, "ALTER TABLE tb_jawaban_lomba ADD COLUMN $nama_kolom INT NULL");
+        } else if ($jenis == 'text') {
+            $query2 = mysqli_query($koneksi, "ALTER TABLE tb_jawaban_lomba ADD COLUMN $nama_kolom VARCHAR(500) NULL");
         } else {
-            $query2 = mysqli_query($koneksi, "ALTER TABLE tb_jawaban_lomba ADD $nama_kolom VARCHAR(255) NULL");
+            // Default ke VARCHAR jika jenis tidak dikenali
+            $query2 = mysqli_query($koneksi, "ALTER TABLE tb_jawaban_lomba ADD COLUMN $nama_kolom VARCHAR(500) NULL");
         }
 
         if ($query2) {
-            $_SESSION['alert_message'] = "✅ Berhasil tambah input '$nama'!";
+            $_SESSION['alert_message'] = "✅ Berhasil tambah input '$nama' dan membuat kolom '$nama_kolom'!";
         } else {
-            $_SESSION['alert_message'] = "⚠️ Input dibuat tapi gagal buat kolom";
+            // Rollback: hapus data yang sudah dimasukkan ke tb_input_lomba
+            mysqli_query($koneksi, "DELETE FROM tb_input_lomba WHERE id = $id_baru");
+            $_SESSION['alert_message'] = "❌ Gagal membuat kolom di tabel jawaban: " . mysqli_error($koneksi);
         }
     } else {
-        $_SESSION['alert_message'] = "❌ Gagal menyimpan data";
+        $_SESSION['alert_message'] = "❌ Gagal menyimpan data: " . mysqli_error($koneksi);
     }
 
     header("Location: ../portal-lomba/atur-form.php");

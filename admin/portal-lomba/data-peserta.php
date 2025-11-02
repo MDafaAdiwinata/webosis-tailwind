@@ -22,29 +22,20 @@ if (isset($_SESSION['alert_message'])) {
 // Fitur Filter
 
 // Ambil nilai filter dari GET
-$jenis_input = isset($_GET['jenis_input']) ? $_GET['jenis_input'] : '';
-$status = isset($_GET['status']) ? $_GET['status'] : '';
+$kelas = isset($_GET['kelas']) ? $_GET['kelas'] : '';
+$jurusan = isset($_GET['jurusan']) ? $_GET['jurusan'] : '';
 $urutkan_data = isset($_GET['urutkan_data']) ? $_GET['urutkan_data'] : '';
 $search   = isset($_GET['search']) ? $_GET['search'] : '';
+$sql = "SELECT * FROM tb_jawaban_lomba WHERE 1=1";
 
-// Ambil semua kolom dari tb_jawaban_lomba
-$columns_query = mysqli_query($koneksi, "DESCRIBE tb_jawaban_lomba");
-$columns = [];
-while ($col = mysqli_fetch_assoc($columns_query)) {
-    $columns[] = $col['Field'];
+if ($kelas != '') {
+    $sql .= " AND kelas = '$kelas'";
 }
-
-// Ambil semua data peserta
-$data_query = mysqli_query($koneksi, "SELECT * FROM tb_jawaban_lomba");
-
-if ($jenis_input != '') {
-    $sql .= " AND jenis_input = '$jenis_input'";
-}
-if ($status != '') {
-    $sql .= " AND status = '$status'";
+if ($jurusan != '') {
+    $sql .= " AND jurusan = '$jurusan'";
 }
 if ($search != '') {
-    $sql .= " AND (id LIKE '%$search%' or nama_lomba LIKE '%$search%' or jenis_input LIKE '%$search%' OR status LIKE '%$search%' or emoji LIKE '%$search%')";
+    $sql .= " AND (id LIKE '%$search%' or nama_lomba LIKE '%$search%' or kelas LIKE '%$search%' OR jurusan LIKE '%$search%' or emoji LIKE '%$search%')";
 }
 if ($urutkan_data == 'terbaru') {
     $sql .= " ORDER BY id ASC";
@@ -52,28 +43,6 @@ if ($urutkan_data == 'terbaru') {
     $sql .= " ORDER BY id DESC";
 }
 
-foreach ($data_row as $key => $value) {
-    echo '<td class="px-6 py-4">';
-
-    // Logika FOTO PREVIEW
-    if (strpos($key, 'foto') !== false || strpos($key, 'file') !== false || strpos($key, 'upload') !== false) {
-        // Asumsi: path foto disimpan relatif, misalnya: uploads/nama_foto.jpg
-        $photo_path = '../../uploads/lomba/' . htmlspecialchars($value);
-
-        // Cek apakah itu file gambar yang valid
-        $extension = pathinfo($value, PATHINFO_EXTENSION);
-        if (!empty($value) && in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif'])) {
-            // Tampilkan foto preview kecil dan modal
-            echo '<img src="' . $photo_path . '" alt="' . htmlspecialchars($key) . '" class="w-16 h-16 object-cover rounded cursor-pointer" onclick="openImageModal(\'' . $photo_path . '\')">';
-        } else {
-            echo htmlspecialchars($value);
-        }
-    } else {
-        // Tampilkan data biasa
-        echo htmlspecialchars($value);
-    }
-    echo '</td>';
-}
 // DELETE DATA
 if (isset($_GET['kode'])) {
     $id = mysqli_real_escape_string($koneksi, $_GET['kode']);
@@ -87,7 +56,7 @@ if (isset($_GET['kode'])) {
             </svg>
             <span class="sr-only">Info</span>
                 <div class="ms-3 me-4 text-sm md:text-md font-medium">
-                    Data Input Lomba Berhasil Di Hapus!
+                    Data Jawaban berhasil dihapus!
                 </div>
             <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-success)]/30 text-[var(--text-success)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-success)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
                 <span class="sr-only">Close</span>
@@ -96,9 +65,27 @@ if (isset($_GET['kode'])) {
                     </svg>
                 </button>
             </div>';
-    header("Location: atur-form.php");
+    header("Location: data-peserta.php");
     exit;
 }
+
+// Ambil semua kolom dari tb_jawaban_lomba
+$columns_query = mysqli_query($koneksi, "DESCRIBE tb_jawaban_lomba");
+$columns = [];
+while ($col = mysqli_fetch_assoc($columns_query)) {
+    $columns[] = $col['Field'];
+}
+
+// Ambil semua data peserta
+$data_query = mysqli_query($koneksi, $sql);
+
+// Ambil informasi input lomba untuk label kolom dinamis
+$input_lomba_query = mysqli_query($koneksi, "SELECT id, nama_lomba, label_lomba FROM tb_input_lomba");
+$input_lomba_data = [];
+while ($input = mysqli_fetch_assoc($input_lomba_query)) {
+    $input_lomba_data["input_" . $input['id']] = $input['label_lomba'];
+}
+
 function selamatkanWaktu()
 {
     date_default_timezone_set('Asia/Jakarta');
@@ -193,7 +180,7 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                     <button type="button"
                         class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group hover:bg-[var(--bg-secondary3)]/10 mt-2"
                         aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">
-                        <svg class="w-5 h-5 text-[var(--txt-primary)]" aria-hidden="true"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             viewBox="0 0 24 24">
                             <path fill-rule="evenodd"
@@ -291,7 +278,7 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                     <button type="button"
                         class="flex items-center w-full px-4 py-2.5 text-base text-[var(--txt-primary)] transition duration-100 rounded-xl cursor-pointer group bg-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/20"
                         aria-controls="dropdownPortalLomba" data-collapse-toggle="dropdownPortalLomba">
-                        <svg class="w-5 h-5 text-[var(--txt-primary)]/50 group-hover:text-[var(--txt-primary)]"
+                        <svg class="w-5 h-5 text-[var(--txt-primary)]"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             fill="currentColor" viewBox="0 0 24 24">
                             <path
@@ -475,32 +462,34 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
             <div class="grid grid-cols-1 md:grid-cols-[4fr_1fr] gap-6 sm:gap-10 rounded-2xl">
                 <form class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     <div class="max-w-2xl">
-                        <select id="countries" name="jenis_input" onchange="this.form.submit()"
+                        <select id="countries" name="kelas" onchange="this.form.submit()"
                             class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-bg-primary focus:border-bg-primary block w-full px-4 cursor-pointer hover:bg-[var(--bg-primary)]/10 transition duration-300">
                             <option value="">
-                                Jenis Input
+                                Kelas
                             </option>
-                            <option value="text" <?= ($jenis_input == 'text') ? 'selected' : '' ?>>Text</option>
-                            <option value="number" <?= ($jenis_input == 'number') ? 'selected' : '' ?>>Number</option>
+                            <option value="x" <?= ($kelas == 'x') ? 'selected' : '' ?>>X</option>
+                            <option value="xi" <?= ($kelas == 'xi') ? 'selected' : '' ?>>XI</option>
+                            <option value="xii" <?= ($kelas == 'xii') ? 'selected' : '' ?>>XII</option>
                         </select>
                     </div>
                     <div class="max-w-2xl">
-                        <select id="countries" name="status" onchange="this.form.submit()"
+                        <select name="jurusan" onchange="this.form.submit()"
                             class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-bg-primary focus:border-bg-primary block w-full px-4 cursor-pointer hover:bg-[var(--bg-primary)]/10 transition duration-300">
-                            <option value="">
-                                Status
-                            </option>
-                            <option value="aktif" <?= ($status == 'aktif') ? 'selected' : '' ?>>Aktif</option>
-                            <option value="nonaktif" <?= ($status == 'nonaktif') ? 'selected' : '' ?>>Non Aktif</option>
+                            <option value="">Semua Jurusan</option>
+                            <option value="Desain Komunikasi Visual" <?= ($jurusan == 'Desain Komunikasi Visual') ? 'selected' : '' ?>>Desain Komunikasi Visual</option>
+                            <option value="Rekayasa Perangkat Lunak" <?= ($jurusan == 'Rekayasa Perangkat Lunak') ? 'selected' : '' ?>>Rekayasa Perangkat Lunak</option>
+                            <option value="Teknik Komputer Jaringan" <?= ($jurusan == 'Teknik Komputer Jaringan') ? 'selected' : '' ?>>Teknik Komputer Jaringan</option>
+                            <option value="Animasi" <?= ($jurusan == 'Animasi') ? 'selected' : '' ?>>Animasi</option>
+                            <option value="Broadcasting TV" <?= ($jurusan == 'Broadcasting TV') ? 'selected' : '' ?>>Broadcasting TV</option>
+                            <option value="Game Development" <?= ($jurusan == 'Game Development') ? 'selected' : '' ?>>Game Development</option>
                         </select>
                     </div>
+
                     <div class="max-w-2xl">
-                        <select id="urutkan_data" name="urutkan_data" onchange="this.form.submit()"
+                        <select name="urutkan_data" onchange="this.form.submit()"
                             class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-bg-primary focus:border-bg-primary block w-full px-4 cursor-pointer hover:bg-[var(--bg-primary)]/10 transition duration-300">
-                            <option value="">
-                                Urutkan
-                            </option>
-                            <option value="terbaru" <?= ($urutkan_data == ' terbaru') ? 'selected' : '' ?>>Terbaru</option>
+                            <option value="">Urutkan</option>
+                            <option value="terbaru" <?= ($urutkan_data == 'terbaru') ? 'selected' : '' ?>>Terbaru</option>
                             <option value="terlama" <?= ($urutkan_data == 'terlama') ? 'selected' : '' ?>>Terlama</option>
                         </select>
                     </div>
@@ -509,7 +498,7 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                         <div class="w-full">
                             <input type="text" id="search" name="search"
                                 class="bg-transparent border border-txt-primary2/50 text-txt-primary2 text-md md:text-lg rounded-2xl focus:ring-[var(--txt-primary2)] focus:border-bg-primary block w-full px-4"
-                                placeholder="Cari"
+                                placeholder="Cari..."
                                 value="<?= htmlspecialchars($search) ?>" />
                         </div>
                         <button type="submit"
@@ -521,23 +510,19 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                             </svg>
                             <span class="sr-only">Search</span>
                         </button>
-
                     </div>
                 </form>
 
                 <div class="flex flex-col items-end justify-center">
-                    <a href="../crud/tambah-input-lomba.php"
+                    <a href="../crud/tambah-jawaban.php"
                         class="focus:outline-none text-[var(--txt-primary)] bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-2xl text-md px-5 py-2.5 shadow-lg hover:shadow-none transition duration-300 cursor-pointer">
                         Tambah
                     </a>
                 </div>
             </div>
-            <d class="flex flex-wrap gap-4 mb-4">
-
-                <!-- Tombol Export ke Excel dan PDF -->
+            <!-- <div class="flex flex-wrap gap-4 mb-4">
                 <?php
-                // Ambil semua parameter GET saat ini untuk diteruskan ke file export
-                // $current_filters = http_build_query($_GET);
+                $current_filters = http_build_query($_GET);
                 ?>
                 <a href="export_excel.php?<?php echo $current_filters; ?>" class="flex items-center text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 rounded-xl px-4 py-2 transition duration-300">
                     <svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -554,7 +539,7 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                     </svg>
                     Export ke PDF
                 </a>
-            </div>
+            </div> -->
 
             <div class="grid grid-cols-1 md:grid-cols-[4fr_1fr] gap-6 sm:gap-10 rounded-2xl"></div>
             <div class="flex items-center justify-center mt-4">
@@ -562,72 +547,100 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                     class="relative overflow-x-auto rounded-xl sm:rounded-2xl border border-[var(--bg-primary)]/30 w-full">
                     <table class="w-full text-md text-left rtl:text-right text-[var(--txt-primary2)] border-collapse">
                         <thead class="text-lg text-[var(--txt-primary2)] bg-[var(--bg-secondary3)]/50 uppercase border-b border-[var(--bg-primary)]/10">
-                            <tr>
-                                <?php foreach ($columns as $col_name): ?>
+                            <?php foreach ($columns as $col_name): ?>
+                                <?php if ($col_name != 'id_user'): // Sembunyikan id_user 
+                                ?>
                                     <th class="px-4 py-3">
                                         <?php
                                         // Tampilkan nama kolom yang lebih user-friendly
                                         if ($col_name == 'id') echo 'ID';
                                         elseif ($col_name == 'kelas') echo 'Kelas';
                                         elseif ($col_name == 'jurusan') echo 'Jurusan';
-                                        elseif (strpos($col_name, 'input_') === 0) {
-                                            // Ambil label dari tb_input_lomba
-                                            $input_id = str_replace('input_', '', $col_name);
-                                            $label_query = mysqli_query($koneksi, "SELECT nama_lomba FROM tb_input_lomba WHERE id='$input_id'");
-                                            $label_data = mysqli_fetch_assoc($label_query);
-                                            echo $label_data['nama_lomba'] ?? $col_name;
+                                        elseif ($col_name == 'created_at') echo 'Tanggal Daftar';
+                                        elseif ($col_name == 'updated_at') echo 'Terakhir Update';
+                                        elseif (isset($input_lomba_data[$col_name])) {
+                                            echo $input_lomba_data[$col_name];
                                         } else {
-                                            echo ucfirst($col_name);
+                                            echo ucfirst(str_replace('_', ' ', $col_name));
                                         }
                                         ?>
                                     </th>
-                                <?php endforeach; ?>
-                                <th class="px-4 py-3 text-end">Aksi</th>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                            <th class="px-4 py-3 text-end">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            // Reset pointer query
-                            mysqli_data_seek($data_query, 0);
-                            while ($row = mysqli_fetch_assoc($data_query)):
+                            if (mysqli_num_rows($data_query) > 0) {
+                                while ($row = mysqli_fetch_assoc($data_query)):
                             ?>
-                                <tr class="hover:bg-[var(--bg-secondary)]/40 transition duration-300">
-                                    <?php foreach ($columns as $col_name): ?>
-                                        <td class="px-4 py-3">
-                                            <?= htmlspecialchars($row[$col_name] ?? '-') ?>
+                                    <tr class="hover:bg-[var(--bg-primary)]/10 transition duration-300">
+                                        <?php foreach ($columns as $col_name): ?>
+                                            <?php if ($col_name != 'id_user'): // Sembunyikan id_user 
+                                            ?>
+                                                <td class="px-4 py-3">
+                                                    <?php
+                                                    if (strpos($col_name, 'input_') === 0 && !empty($row[$col_name])) {
+                                                        echo htmlspecialchars($row[$col_name]);
+                                                    } elseif ($col_name == 'created_at' || $col_name == 'updated_at') {
+                                                        echo date('d/m/Y H:i', strtotime($row[$col_name]));
+                                                    } else {
+                                                        echo htmlspecialchars($row[$col_name] ?? '-');
+                                                    }
+                                                    ?>
+                                                </td>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                        <td class="px-6 py-4 text-end space-y-2">
+                                            <a href="../crud/ubah-jawaban.php?id=<?= $row['id'] ?>" class="font-medium text-yellow-600 hover:underline text-lg me-0 md:me-2">
+                                                UBAH
+                                            </a>
+                                            <button data-modal-target="modalHapusJawaban<?= $row['id']; ?>" data-modal-toggle="modalHapusJawaban<?= $row['id']; ?>" class="font-medium text-md lg:text-lg text-red-600 hover:underline">
+                                                HAPUS
+                                            </button>
                                         </td>
-                                    <?php endforeach; ?>
-                                    <td class="px-6 py-4 text-end space-y-2">
-                                        <a href="ubah-data.php?id=<?= $row['id'] ?>" class="font-medium text-yellow-600 hover:underline">
-                                            UBAH
-                                        </a>
-                                        <a href="?hapus=<?= $row['id'] ?>" class="font-medium text-red-600 hover:underline"
-                                            onclick="return confirm('Yakin hapus data?')">
-                                            HAPUS
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
+                                    </tr>
+
+                                    <!-- Modal Data - Delete -->
+                                    <div id="modalHapusJawaban<?= $row['id']; ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                                        <div class="relative p-4 w-full max-w-md max-h-full">
+                                            <div class="relative bg-[var(--bg-primary)] rounded-lg shadow-sm">
+                                                <button type="button" class="absolute top-3 end-2.5 text-[var(--txt-primary)]/50 bg-transparent hover:bg-[var(--txt-primary)]/30 hover:text-[var(--txt-primary)]/80 rounded-xl text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer" data-modal-hide="modalHapusJawaban<?= $row['id']; ?>">
+                                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                                    </svg>
+                                                    <span class="sr-only">Close modal</span>
+                                                </button>
+                                                <div class="p-4 md:p-5 text-center">
+                                                    <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+                                                    <h3 class="mb-5 text-lg font-normal text-[var(--txt-primary)]/60">
+                                                        Yakin ingin menghapus data ini?
+                                                    </h3>
+                                                    <button data-modal-hide="modalHapusJawaban<?= $row['id']; ?>" type="button" class="cursor-pointer py-2.5 px-5 text-sm font-medium text-[var(--txt-primary)] focus:outline-none bg-[var(--bg-secondary3)]/0 rounded-lg border border-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/10 hover:text-[var(--txt-primary)] focus:z-10 ">
+                                                        Cancel
+                                                    </button>
+                                                    <a href="?kode=<?= $row['id']; ?>" class="ms-2 text-[var(--txt-primary)] bg-[var(--text-danger)]/80 hover:bg-[var(--text-danger)] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">
+                                                        Hapus
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            <?php
+                                endwhile;
+                            } else {
+                                echo '<tr><td colspan="' . (count($columns) + 1) . '" class="px-6 py-8 text-center">Tidak ada data peserta.</td></tr>';
+                            }
+                            ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <div id="imageModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full">
-            <div class="relative p-4 w-full max-w-3xl h-full md:h-auto">
-                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                    <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="imageModal">
-                        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                        </svg>
-                        <span class="sr-only">Close modal</span>
-                    </button>
-                    <div class="p-6 text-center">
-                        <img id="modalImage" src="" alt="Preview Foto" class="max-w-full h-auto mx-auto rounded">
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </div>
 
     <!-- Tutup Main Content Dashboard -->

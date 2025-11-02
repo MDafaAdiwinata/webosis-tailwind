@@ -13,13 +13,66 @@ if (!isset($_SESSION['username'])) {
 
 // Ambil username dari session untuk ditampilkan
 $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Unknown';
+
+// Query untuk mengambil input lomba yang aktif
 $input_lomba = mysqli_query($koneksi, "SELECT * FROM tb_input_lomba WHERE status='aktif' ORDER BY id ASC");
 
-
-// Query Ambil Data dari table about
+// Query Ambil Data dari table main content
 $sql = "SELECT * FROM tb_main_content";
 $ambilMain = mysqli_query($koneksi, $sql);
 $tampilMain = mysqli_fetch_assoc($ambilMain);
+
+// Cek apakah tombol kirim ditekan
+if (isset($_POST['kirim'])) {
+    $kelas = mysqli_real_escape_string($koneksi, $_POST['kelas']);
+    $jurusan = mysqli_real_escape_string($koneksi, $_POST['jurusan']);
+
+    // Validasi
+    if (empty($kelas) || empty($jurusan)) {
+        echo "<script>alert('Mohon isi kelas dan jurusan!');</script>";
+    } else {
+        // Mulai transaction
+        mysqli_begin_transaction($koneksi);
+
+        try {
+            // 1. Bangun query INSERT dinamis
+            $columns = "kelas, jurusan";
+            $values = "'$kelas', '$jurusan'";
+
+            // 2. Tambahkan kolom dinamis
+            mysqli_data_seek($input_lomba, 0);
+            while ($input = mysqli_fetch_assoc($input_lomba)) {
+                $nama_kolom = "input_" . $input['id'];
+                $value = mysqli_real_escape_string($koneksi, $_POST[$nama_kolom] ?? '');
+
+                $columns .= ", $nama_kolom";
+                $values .= ", '$value'";
+            }
+
+            // 3. Eksekusi query INSERT
+            $sql_insert = "INSERT INTO tb_jawaban_lomba ($columns) VALUES ($values)";
+            $result = mysqli_query($koneksi, $sql_insert);
+
+            if (!$result) {
+                throw new Exception("Gagal menyimpan data: " . mysqli_error($koneksi));
+            }
+
+            // Commit transaction
+            mysqli_commit($koneksi);
+
+            // Success message
+            echo "<script>
+                alert('✅ Data berhasil dikirim!');
+                window.location.href = 'portal-lomba.php';
+            </script>";
+            exit;
+        } catch (Exception $e) {
+            // Rollback transaction
+            mysqli_rollback($koneksi);
+            echo "<script>alert('❌ Gagal: " . addslashes($e->getMessage()) . "');</script>";
+        }
+    }
+}
 
 ?>
 <html lang="en">
@@ -174,11 +227,23 @@ $tampilMain = mysqli_fetch_assoc($ambilMain);
 
     <section id="inputDataLomba" class="bg-[var(--bg-secondary2)]">
         <div class="px-4 container mx-auto py-20 md:py-32">
-            <form class="max-w-6xl flex flex-col justify-center mx-auto">
+            <?php if (isset($error_message)): ?>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <?= $error_message ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['success_message'])): ?>
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                    <?= $_SESSION['success_message'] ?>
+                    <?php unset($_SESSION['success_message']); ?>
+                </div>
+            <?php endif; ?>
+            <form class="max-w-6xl flex flex-col justify-center mx-auto" method="POST" action="">
                 <label for="kelas" class="block text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
                     Kelas
                 </label>
-                <select id="kelas"
+                <select id="kelas" name="kelas"
                     class="bg-[var(--bg-secondary)] border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl block w-full px-6 py-2 md:py-4 mt-3 hover:cursor-pointer hover:bg-[var(--bg-secondary)]/90 transition duration-500">
                     <option value=""></option>
                     <option value="X">X</option>
@@ -189,7 +254,7 @@ $tampilMain = mysqli_fetch_assoc($ambilMain);
                 <label for="jurusan" class="block mt-8 md:mt-14 text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
                     Jurusan
                 </label>
-                <select id="jurusan"
+                <select id="jurusan" name="jurusan"
                     class="bg-[var(--bg-secondary)] border border-[var(--bg-primary)] text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl block w-full px-6 py-2 md:py-4 mt-3 hover:cursor-pointer hover:bg-[var(--bg-secondary)]/90 transition duration-500">
                     <option value=""></option>
                     <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
@@ -200,24 +265,27 @@ $tampilMain = mysqli_fetch_assoc($ambilMain);
                     <option value="Game Development">Game Development</option>
                 </select>
 
-                <?php while ($tampil_input_lomba = mysqli_fetch_assoc($input_lomba)) : ?>
-                    <label for="<?= $tampil_input_lomba['nama_lomba']; ?>"
+                <?php
+                // Reset pointer query untuk loop kedua
+                mysqli_data_seek($input_lomba, 0);
+                while ($tampil_input_lomba = mysqli_fetch_assoc($input_lomba)) : ?>
+                    <label for="input_<?= $tampil_input_lomba['id']; ?>"
                         class="block mt-8 md:mt-14 text-xl md:text-2xl lg:text-3xl font-bold text-[var(--txt-primary)]">
                         <?= $tampil_input_lomba['label_lomba'] . ' ' . $tampil_input_lomba['emoji']; ?>
                     </label>
                     <input
                         type="<?= $tampil_input_lomba['jenis_input']; ?>"
-                        id="<?= $tampil_input_lomba['nama_lomba']; ?>"
-                        name="<?= $tampil_input_lomba['nama_lomba']; ?>"
+                        id="input_<?= $tampil_input_lomba['id']; ?>"
+                        name="input_<?= $tampil_input_lomba['id']; ?>"
                         class="bg-[var(--bg-secondary3)] border border-[var(--txt-primary2)]/80 text-[var(--txt-primary2)] text-md md:text-lg rounded-2xl md:rounded-3xl focus:ring-[var(--txt-primary2)] mt-3 focus:border-[var(--txt-primary2)] block w-full px-4 py-2.5 md:py-4"
-                        placeholder="..." required />
+                        placeholder="Masukkan <?= $tampil_input_lomba['label_lomba']; ?>"
+                        required />
                 <?php endwhile; ?>
 
                 <button type="submit" name="kirim"
                     class="text-[var(--txt-primary2)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/80 focus:ring-3 focus:outline-none focus:ring-[var(--bg-secondary)] ms-auto font-bold rounded-full text-md md:text-xl w-full md:w-fit px-8 py-2.5 mt-12 cursor-pointer transition duration-500 shadow-md">
                     Kirim
                 </button>
-
             </form>
         </div>
     </section>

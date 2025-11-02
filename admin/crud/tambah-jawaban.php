@@ -12,6 +12,10 @@ if (!isset($_SESSION['username'])) {
         ";
 }
 
+// Ambil username dari session untuk ditampilkan
+$username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Unknown';
+$input_lomba = mysqli_query($koneksi, "SELECT * FROM tb_input_lomba WHERE status='aktif' ORDER BY id ASC");
+
 // Menyiapkan variabel untuk pesan alert dari session
 $alert_message = '';
 if (isset($_SESSION['alert_message'])) {
@@ -19,21 +23,13 @@ if (isset($_SESSION['alert_message'])) {
     unset($_SESSION['alert_message']); // Hapus pesan dari session agar tidak tampil lagi
 }
 
+// Tambah Data
 if (isset($_POST['tambah'])) {
+    $kelas = mysqli_real_escape_string($koneksi, $_POST['kelas']);
+    $jurusan = mysqli_real_escape_string($koneksi, $_POST['jurusan']);
 
-    // Ambil dan amankan input
-    $judul = mysqli_real_escape_string($koneksi, $_POST['judul_news']);
-    $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi_news']);
-
-    $gambar = $_FILES['gambar']['name'];
-    $tmp = $_FILES['gambar']['tmp_name'];
-    $ukuran_gambar = $_FILES['gambar']['size'];
-
-    // Ambil ekstensi file
-    $ext = strtolower(pathinfo($gambar, PATHINFO_EXTENSION));
-    // Validasi tipe file
-    $tipe_valid = ['jpg', 'jpeg', 'png'];
-    if (!in_array($ext, $tipe_valid)) {
+    // Validasi
+    if (empty($kelas) || empty($jurusan)) {
         $_SESSION['alert_message'] = '
             <div id="alert-2" class="flex items-center p-4 text-[var(--text-danger)] rounded-2xl bg-[var(--bg-danger)]" role="alert">
             <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -41,7 +37,7 @@ if (isset($_POST['tambah'])) {
             </svg>
             <span class="sr-only">Info</span>
                 <div class="ms-3 me-4 text-md font-medium">
-                    File harus berupa JPG, JPEG, atau PNG
+                    Harap isi kelas dan jurusan
                 </div>
             <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-danger)]/30 text-[var(--text-danger)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-danger)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
                 <span class="sr-only">Close</span>
@@ -50,51 +46,35 @@ if (isset($_POST['tambah'])) {
                     </svg>
                 </button>
             </div>';
-        header("Location: tambah-news.php");
         exit;
-    }
+    } else {
+        // Bangun query INSERT dinamis
+        $columns = "kelas, jurusan";
+        $values = "'$kelas', '$jurusan'";
 
-    // Validasi ukuran file (maks 2MB)
-    if ($ukuran_gambar > 2 * 1024 * 1024) {
-        $_SESSION['alert_message'] = '
-            <div id="alert-2" class="flex items-center p-4 text-[var(--text-warning)] rounded-2xl bg-[var(--bg-warning)]" role="alert">
+        // Tambahkan kolom dinamis
+        mysqli_data_seek($input_lomba, 0);
+        while ($input = mysqli_fetch_assoc($input_lomba)) {
+            $nama_kolom = "input_" . $input['id'];
+            $value = mysqli_real_escape_string($koneksi, $_POST[$nama_kolom] ?? '');
+
+            $columns .= ", $nama_kolom";
+            $values .= ", '$value'";
+        }
+
+        // Eksekusi query
+        $sql_insert = "INSERT INTO tb_jawaban_lomba ($columns) VALUES ($values)";
+        $result = mysqli_query($koneksi, $sql_insert);
+
+        if ($result) {
+            $_SESSION['alert_message'] = '
+        <div id="alert-2" class="flex items-center p-4 text-[var(--text-success)] rounded-2xl bg-[var(--bg-success)]" role="alert">
             <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
             </svg>
             <span class="sr-only">Info</span>
-                <div class="ms-3 me-4 text-md font-medium">
-                    Ukuran file terlalu besar! Maksimal 2MB
-                </div>
-            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-warning)]/30 text-[var(--text-warning)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-warning)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
-                <span class="sr-only">Close</span>
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                    </svg>
-                </button>
-            </div>';
-        header("Location: tambah-news.php");
-        exit;
-    }
-
-    // Buat nama file unik untuk menghindari penimpaan file
-    $nama_gambar_baru = uniqid() . '.' . $ext;
-    move_uploaded_file($tmp, "../../assets/img/news/" . $nama_gambar_baru);
-
-    mysqli_query($koneksi, "INSERT INTO tb_news SET
-          gambar = '$nama_gambar_baru',
-          judul_news = '$judul',
-          deskripsi_news = '$deskripsi'
-      ");
-
-    // Simpan pesan sukses ke dalam session
-    $_SESSION['alert_message'] = '
-            <div id="alert-2" class="flex items-center p-4 text-[var(--text-success)] rounded-2xl bg-[var(--bg-success)]" role="alert">
-            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-            </svg>
-            <span class="sr-only">Info</span>
-                <div class="ms-3 me-4 text-md font-medium">
-                    Data berhasil ditambahkan!
+                <div class="ms-3 me-4 text-sm md:text-md font-medium">
+                    Data Jawaban berhasil ditambahkan!
                 </div>
             <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-success)]/30 text-[var(--text-success)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-success)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
                 <span class="sr-only">Close</span>
@@ -103,8 +83,29 @@ if (isset($_POST['tambah'])) {
                     </svg>
                 </button>
             </div>';
-    header("Location: ../kelola-konten/news.php");
-    exit;
+            header("Location: ../portal-lomba/data-peserta.php");
+            exit;
+        } else {
+            $_SESSION['alert_message'] = '
+            <div id="alert-2" class="flex items-center p-4 text-[var(--text-danger)] rounded-2xl bg-[var(--bg-danger)]" role="alert">
+            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span class="sr-only">Info</span>
+                <div class="ms-3 me-4 text-md font-medium">
+                    Gagal menambah data jawaban!
+                </div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-danger)]/30 text-[var(--text-danger)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-danger)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
+                <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>';
+            header("Location: ../portal-lomba/data-peserta.php");
+            exit;
+        }
+    }
 }
 
 function selamatkanWaktu()
@@ -134,7 +135,7 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>News - Admin Dashboard</title>
+    <title>Jawaban - Admin Dashboard</title>
 
     <!-- Flowbite CSS -->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
@@ -162,7 +163,7 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
         <div class="grid grid-cols-2 gap-4 mt-6 sm:mt-4">
             <div class="flex items-center justify-start h-10 md:h-20">
                 <h1 class="text-lg md:text-2xl lg:text-2xl font-bold text-[var(--txt-primary2)]">
-                    Kelola Konten
+                    Interaksi
                 </h1>
             </div>
             <div class="flex items-center justify-end h-10 md:h-20">
@@ -177,48 +178,74 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
 
         <div class="flex flex-col gap-6">
             <div class="grid grid-cols-1 md:grid-cols-2 items-center justify-center gap-4">
-                <a href="../kelola-konten/news.php"
+                <a href="../portal-lomba/data-peserta.php"
                     class="w-fit focus:outline-none text-[var(--txt-primary)] bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-xl text-sm md:text-md px-5 py-2.5 shadow-lg hover:shadow-none transition duration-300 cursor-pointer">
                     Kembali
                 </a>
                 <h1 class="text-md md:text-lg lg:text-xl xl:text-2xl font-semibold text-[var(--txt-primary2)] text-center md:text-end mt-4 lg:mt-0">
-                    News - Tambah data
+                    Jawaban - Tambah data
                 </h1>
             </div>
 
             <div class="flex w-full items-center justify-center mt-4">
-                <form class="space-y-4 w-full lg:w-2/5" action="" method="POST" enctype="multipart/form-data">
+                <form class="space-y-4 w-full lg:w-2/3" method="POST" action="">
                     <div class="mb-6">
                         <?php echo $alert_message; ?>
                     </div>
-                    <div class="mb-6">
-                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
-                            for="gambar">
-                            Unggah Gambar (.jpg, .png, .jpeg)
-                        </label>
-                        <input
-                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
-                            id="gambar" type="file" accept=".jpg, .png, .jpeg" name="gambar" required>
+                    <!-- Data Dasar -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="kelas" class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
+                                Kelas
+                            </label>
+                            <select id="kelas" name="kelas" required
+                                class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5">
+                                <option value="">Pilih Kelas</option>
+                                <option value="X">X</option>
+                                <option value="XI">XI</option>
+                                <option value="XII">XII</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="jurusan" class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
+                                Jurusan
+                            </label>
+                            <select id="jurusan" name="jurusan" required
+                                class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5">
+                                <option value="">Pilih Jurusan</option>
+                                <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+                                <option value="Rekayasa Perangkat Lunak">Rekayasa Perangkat Lunak</option>
+                                <option value="Teknik Komputer Jaringan">Teknik Komputer Jaringan</option>
+                                <option value="Animasi">Animasi</option>
+                                <option value="Broadcasting TV">Broadcasting TV</option>
+                                <option value="Game Development">Game Development</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="mb-6">
-                        <label for="judul_news"
-                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
-                            Judul News
-                        </label>
-                        <input type="text" name="judul_news" id="judul_news"
-                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5" required />
-                    </div>
-                    <div>
-                        <label for="deskripsiNews"
-                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
-                            Deskripsi
-                        </label>
-                        <textarea id="deskripsiNews" rows="4" name="deskripsi_news"
-                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"></textarea>
-                    </div>
+
+                    <!-- Input Dinamis -->
+                    <?php
+                    mysqli_data_seek($input_lomba, 0);
+                    while ($tampil_input_lomba = mysqli_fetch_assoc($input_lomba)) :
+                    ?>
+                        <div class="mb-6">
+                            <label for="input_<?= $tampil_input_lomba['id']; ?>"
+                                class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
+                                <?= $tampil_input_lomba['label_lomba'] . ' ' . $tampil_input_lomba['emoji']; ?>
+                            </label>
+                            <input
+                                type="<?= $tampil_input_lomba['jenis_input']; ?>"
+                                id="input_<?= $tampil_input_lomba['id']; ?>"
+                                name="input_<?= $tampil_input_lomba['id']; ?>"
+                                class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"
+                                placeholder="Masukkan <?= $tampil_input_lomba['label_lomba']; ?>"
+                                required />
+                        </div>
+                    <?php endwhile; ?>
+
                     <button type="submit" name="tambah"
                         class="w-full text-[var(--txt-primary)] bg-[var(--text-success)] hover:bg-[var(--text-success)]/80 focus:ring-4 focus:outline-none focus:ring-[var(--txt-primary2)]/60 font-bold rounded-xl text-lg cursor-pointer px-5 py-2.5 text-center mt-4 transition duration-500">
-                        Tambah
+                        Tambah Data
                     </button>
                 </form>
             </div>
