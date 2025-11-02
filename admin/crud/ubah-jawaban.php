@@ -67,6 +67,7 @@ if (mysqli_num_rows($data_peserta) == 0) {
     header("Location: ../portal-lomba/data-peserta.php");
     exit;
 }
+
 $peserta = mysqli_fetch_assoc($data_peserta);
 
 // Ambil data input lomba yang aktif
