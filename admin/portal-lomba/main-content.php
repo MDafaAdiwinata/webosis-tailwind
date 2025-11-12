@@ -14,102 +14,59 @@ if (!isset($_SESSION['username'])) {
 // Ambil username dari session untuk ditampilkan
 $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Unknown';
 
-// Query Ambil Data dari table about
-$sql = "SELECT * FROM tb_main_content";
-$ambilMain = mysqli_query($koneksi, $sql);
-$tampilMain = mysqli_fetch_assoc($ambilMain);
+// Query Ambil Data dari table main content
+$sqlText = "SELECT * FROM tb_main_content_text";
+$ambilMainText = mysqli_query($koneksi, $sqlText);
+$tampilMainText = mysqli_fetch_assoc($ambilMainText);
+
+$sqlImg = "SELECT * FROM tb_main_content_img";
+$ambilMainImg = mysqli_query($koneksi, $sqlImg);
 
 // Menyiapkan variabel untuk pesan alert dari session
 $alert_message = '';
 if (isset($_SESSION['alert_message'])) {
     $alert_message = $_SESSION['alert_message'];
-    unset($_SESSION['alert_message']); // Hapus pesan dari session agar tidak tampil lagi
+    unset($_SESSION['alert_message']);
 }
 
-// Proses Update Data Main Content
-if (isset($_POST['ubah'])) {
-    $id_content = $_POST['id_content'];
-    $judul_portal = mysqli_real_escape_string($koneksi, $_POST['judul_portal']);
-    $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
-    $link_teknis = mysqli_real_escape_string($koneksi, $_POST['link_teknis']);
-    $link_reels = mysqli_real_escape_string($koneksi, $_POST['link_reels']);
-    $link_contact = mysqli_real_escape_string($koneksi, $_POST['link_contact']);
+// Delete Data
+if (isset($_GET['kode'])) {
+    $id_content_img = mysqli_real_escape_string($koneksi, $_GET['kode']);
 
-    // Folder untuk menyimpan gambar
-    $folder = '../../assets/img/galeri/';
+    // Ambil nama file gambar untuk dihapus dari server
+    $result = mysqli_query($koneksi, "SELECT img_content FROM tb_main_content_img WHERE id_content_img='$id_content_img'");
+    $data   = mysqli_fetch_array($result);
 
-    // Array untuk menyimpan nama file gambar baru
-    $gambar_fields = ['gambar_1', 'gambar_2', 'gambar_3', 'gambar_4'];
-    $update_gambar = "";
+    if ($data) {
+        $gambar_untuk_dihapus = $data['img_content'];
+        $file_path = "../../assets/img/galeri/" . $gambar_untuk_dihapus;
 
-    // Proses setiap gambar
-    foreach ($gambar_fields as $field) {
-        if (!empty($_FILES[$field]['name'])) {
-            $gambar_baru = $_FILES[$field]['name'];
-            $tmp = $_FILES[$field]['tmp_name'];
-            $newName = time() . '_' . uniqid() . '_' . $gambar_baru;
-            $pathBaru = $folder . $newName;
-
-            // Upload gambar baru
-            if (move_uploaded_file($tmp, $pathBaru)) {
-                $update_gambar .= "$field = '$newName', ";
-
-                // Hapus gambar lama jika ada
-                $gambar_lama = $tampilMain[$field];
-                if (!empty($gambar_lama) && file_exists($folder . $gambar_lama)) {
-                    unlink($folder . $gambar_lama);
-                }
-            }
+        // Cek jika file gambar ada, lalu hapus
+        if (!empty($gambar_untuk_dihapus) && file_exists($file_path)) {
+            unlink($file_path);
         }
     }
 
-    // Query update TANPA updated_at
-    $query = "UPDATE tb_main_content SET 
-              judul_portal = '$judul_portal', 
-              deskripsi = '$deskripsi',
-              link_teknis = '$link_teknis',
-              link_reels = '$link_reels',
-              link_contact = '$link_contact',
-              " . $update_gambar . "
-              id_content = '$id_content'
-              WHERE id_content = '$id_content'";
+    // Hapus data dari database
+    mysqli_query($koneksi, "DELETE FROM tb_main_content_img WHERE id_content_img='$id_content_img'") or die(mysqli_error($koneksi));
 
-    if (mysqli_query($koneksi, $query)) {
-        $_SESSION['alert_message'] = '
-        <div id="alert-2" class="flex items-center p-4 text-[var(--text-success)] rounded-2xl bg-[var(--bg-success)]" role="alert">
+    // Simpan pesan sukses
+    $_SESSION['alert_message'] = '
+            <div id="alert-2" class="flex items-center p-4 text-[var(--text-success)] rounded-2xl bg-[var(--bg-success)]" role="alert">
             <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
             </svg>
             <span class="sr-only">Info</span>
-            <div class="ms-3 me-4 text-sm md:text-md font-medium">
-                Main Content berhasil diperbarui!
-            </div>
+                <div class="ms-3 me-4 text-md font-medium">
+                    Data berhasil dihapus
+                </div>
             <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-success)]/30 text-[var(--text-success)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-success)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
                 <span class="sr-only">Close</span>
-                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                </svg>
-            </button>
-        </div>';
-    } else {
-        $_SESSION['alert_message'] = '
-        <div id="alert-2" class="flex items-center p-4 text-[var(--text-danger)] rounded-2xl bg-[var(--bg-danger)]" role="alert">
-            <svg class="shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-            </svg>
-            <span class="sr-only">Info</span>
-            <div class="ms-3 me-4 text-sm md:text-md font-medium">
-                Gagal memperbarui Main Content: ' . mysqli_error($koneksi) . '
-            </div>
-            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-[var(--bg-danger)]/30 text-[var(--text-danger)] rounded-lg cursor-pointer focus:ring-2 p-1.5 transition duration-300 border border-[var(--bg-danger)] inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-2" aria-label="Close">
-                <span class="sr-only">Close</span>
-                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                </svg>
-            </button>
-        </div>';
-    }
-
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>';
     header("Location: main-content.php");
     exit;
 }
@@ -496,46 +453,32 @@ $sapaan = selamatkanWaktu();
                 Main Content
             </h1>
             <?php echo $alert_message; ?>
-            <div class="flex flex-col border border-[var(--txt-primary2)]/50 rounded-2xl p-4 lg:p-6 mb-32">
+            <div class="flex flex-col border border-[var(--txt-primary2)]/50 rounded-2xl p-4 lg:p-6">
                 <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-10">
                     <div class="flex flex-col items-start justify-center gap-4">
                         <h1 class="text-lg md:text-xl lg:text-2xl font-bold text-start text-[var(--txt-primary2)]">
-                            <?= $tampilMain['judul_portal']; ?>
+                            <?= $tampilMainText['judul_portal']; ?>
                         </h1>
                         <p class="text-md md:text-lg lg:text-xl font-normal text-start text-[var(--txt-primary2)]">
-                            <?= $tampilMain['deskripsi']; ?>
+                            <?= $tampilMainText['deskripsi']; ?>
                         </p>
                     </div>
                     <div class="flex flex-col items-center justify-center gap-4">
-                        <a href="<?= $tampilMain['link_teknis']; ?>" target="_blank"
+                        <a href="<?= $tampilMainText['link_teknis']; ?>" target="_blank"
                             class="w-full text-center py-2 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-lg cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none">
                             TEKNIS LOMBA
                         </a>
-                        <a href="<?= $tampilMain['link_reels']; ?>" target="_blank"
+                        <a href="<?= $tampilMainText['link_reels']; ?>" target="_blank"
                             class="w-full text-center py-2 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-lg cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none">
                             REELS INFORMASI LOMBA
                         </a>
-                        <a href="<?= $tampilMain['link_contact']; ?>" target="_blank"
+                        <a href="<?= $tampilMainText['link_contact']; ?>" target="_blank"
                             class="w-full text-center py-2 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-lg cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none">
                             CONTACT PERSON
                         </a>
                     </div>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-12 justify-center gap-8">
-                    <img src="../../assets/img/galeri/<?= $tampilMain['gambar_1']; ?>"
-                        class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary3)]/50 rounded-3xl hover:bg-[var(--bg-secondary3)] transition duration-500 border-2 border-[var(--bg-primary)]/20 hover:border-[var(--bg-primary)] cursor-pointer hover:scale-101 shadow-md"
-                        alt="Galeri" />
-                    <img src="../../assets/img/galeri/<?= $tampilMain['gambar_2']; ?>"
-                        class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary3)]/50 rounded-3xl hover:bg-[var(--bg-secondary3)] transition duration-500 border-2 border-[var(--bg-primary)]/20 hover:border-[var(--bg-primary)] cursor-pointer hover:scale-101 shadow-md"
-                        alt="Galeri" />
-                    <img src="../../assets/img/galeri/<?= $tampilMain['gambar_3']; ?>"
-                        class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary3)]/50 rounded-3xl hover:bg-[var(--bg-secondary3)] transition duration-500 border-2 border-[var(--bg-primary)]/20 hover:border-[var(--bg-primary)] cursor-pointer hover:scale-101 shadow-md"
-                        alt="Galeri" />
-                    <img src="../../assets/img/galeri/<?= $tampilMain['gambar_4']; ?>"
-                        class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bbg-[var(--bg-secondary3)]/50 rounded-3xl hover:bg-[var(--bg-secondary3)] transition duration-500 border-2 border-[var(--bg-primary)]/20 hover:border-[var(--bg-primary)] cursor-pointer hover:scale-101 shadow-md"
-                        alt="Galeri" />
-                </div>
-                <button data-modal-target="modalEditMainContent" data-modal-toggle="modalEditMainContent"
+                <a href="../crud/ubah-content-text.php?kode=<?= $tampilMainText['id_content_text']; ?>"
                     class="bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/50 border-2 border-[var(--bg-secondary)] px-4 py-2 rounded-2xl flex items-center justify-center text-lg lg:text-xl gap-2 shadow-lg cursor-pointer hover:shadow-none transition duration-300 mt-12 ms-auto">
                     <svg class="w-6 lg:w-8 h-6 lg:h-8 text-[var(--txt-primary2)]" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -543,134 +486,106 @@ $sapaan = selamatkanWaktu();
                             d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
                     </svg>
                     Edit
-                </button>
-
-                <!-- Modal Edit - Tentang -->
-                <div id="modalEditMainContent" tabindex="-1" aria-hidden="true"
-                    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                    <div class="relative p-4 w-full max-w-xl max-h-full">
-                        <!-- Modal content -->
-                        <div class="relative bg-[var(--txt-primary)] rounded-xl shadow-sm">
-                            <!-- Modal header -->
-                            <div
-                                class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-[var(--bg-primary)]/50">
-                                <h3 class="text-xl font-semibold text-[var(--txt-primary2)]">
-                                    Edit Main Content
-                                </h3>
-                                <button type="button"
-                                    class="end-2.5 text-[var(--txt-primary2)]/80 bg-transparent hover:bg-[var(--bg-primary)]/20 hover:text-[var(--txt-primary2)] rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer"
-                                    data-modal-hide="modalEditMainContent">
-                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
-                            </div>
-                            <!-- Modal body -->
-                            <div class="p-4 md:p-5">
-                                <form class="space-y-4" action="" method="POST" enctype="multipart/form-data">
-                                    <input type="hidden" name="id_content" value="<?= $tampilMain['id_content']; ?>">
-                                    <div class="mb-6">
-                                        <label for="titleText"
-                                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
-                                            Title Text
-                                        </label>
-                                        <input type="text" name="judul_portal" id="titleText" value="<?= $tampilMain['judul_portal']; ?>"
-                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"
-                                            value="PORTAL LOMBA BI CLASSICA" />
-                                    </div>
-                                    <div>
-                                        <label for="deskripsi"
-                                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
-                                            Deskripsi
-                                        </label>
-                                        <textarea id="deskripsi" rows="4" name="deskripsi"
-                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"><?= $tampilMain['deskripsi']; ?></textarea>
-                                    </div>
-                                    <h1 class="text-lg mt-12">
-                                        Link Main Content
-                                    </h1>
-                                    <div class="mb-6">
-                                        <label for="linkTeknisLomba"
-                                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
-                                            Link Teknis Lomba
-                                        </label>
-                                        <input type="text" name="link_teknis" id="linkTeknisLomba"
-                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"
-                                            value="<?= $tampilMain['link_teknis']; ?>" />
-                                    </div>
-                                    <div class="mb-6">
-                                        <label for="linkInformasiLomba"
-                                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
-                                            Link Informasi Lomba
-                                        </label>
-                                        <input type="text" name="link_reels" id="linkInformasiLomba"
-                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"
-                                            value="<?= $tampilMain['link_reels']; ?>" />
-                                    </div>
-                                    <div class="mb-6">
-                                        <label for="linkContact"
-                                            class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]">
-                                            Link Contact
-                                        </label>
-                                        <input type="text" name="link_contact" id="linkContact"
-                                            class="bg-transparent border border-[var(--bg-primary)]/50 text-[var(--txt-primary2)] text-md rounded-xl focus:ring-[var(--txt-primary2)]/80 focus:border-[var(--txt-primary2)]/80 block w-full p-2.5"
-                                            value="<?= $tampilMain['link_contact']; ?>" />
-                                    </div>
-                                    <h1 class="text-lg mt-12">
-                                        Gambar/Galeri Portal Lomba
-                                    </h1>
-                                    <div class="mb-6">
-                                        <img src="../../assets/img/galeri/<?= $tampilMain['gambar_1']; ?>" alt="Image" class="mb-6">
-                                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
-                                            for="imgGaleri1">
-                                            Gambar 1
-                                        </label>
-                                        <input name="gambar_1"
-                                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
-                                            id="imgGaleri1" type="file">
-                                    </div>
-                                    <div class="mb-6">
-                                        <img src="../../assets/img/galeri/<?= $tampilMain['gambar_2']; ?>" alt="Image" class="mb-6">
-                                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
-                                            for="imgGaleri2">
-                                            Gambar 2
-                                        </label>
-                                        <input name="gambar_2"
-                                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
-                                            id="imgGaleri2" type="file">
-                                    </div>
-                                    <div class="mb-6">
-                                        <img src="../../assets/img/galeri/<?= $tampilMain['gambar_3']; ?>" alt="Image" class="mb-6">
-                                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
-                                            for="imgGaleri3">
-                                            Gambar 3
-                                        </label>
-                                        <input name="gambar_3"
-                                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
-                                            id="imgGaleri3" type="file">
-                                    </div>
-                                    <div class="mb-6">
-                                        <img src="../../assets/img/galeri/<?= $tampilMain['gambar_4']; ?>" alt="Image" class="mb-6">
-                                        <label class="block mb-2 text-lg font-normal text-[var(--txt-primary2)]"
-                                            for="imgGaleri1">
-                                            Gambar 4
-                                        </label>
-                                        <input name="gambar_4"
-                                            class="block w-full text-md text-[var(--txt-primary2)] border border-[var(--bg-primary)]/50 rounded-xl cursor-pointer bg-transparent"
-                                            id="imgGaleri1" type="file">
-                                    </div>
-                                    <button type="submit" name="ubah"
-                                        class="w-full text-[var(--txt-primary2)] bg-[var(--bg-secondary)]/80 hover:bg-[var(--bg-secondary)] focus:ring-4 focus:outline-none focus:ring-[var(--txt-primary2)]/60 font-bold rounded-xl text-lg cursor-pointer px-5 py-2.5 text-center mt-4 transition duration-500">
-                                        Simpan
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                </a>
+            </div>
+            <div class="flex flex-col border border-[var(--txt-primary2)]/50 rounded-2xl p-4 lg:p-6 mb-32">
+                <div class="flex flex-col items-end justify-center mb-12">
+                    <a href="../crud/tambah-content-img.php"
+                        class="focus:outline-none text-[var(--txt-primary)] bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-2xl text-md px-5 py-2.5 shadow-lg hover:shadow-none transition duration-300 cursor-pointer">
+                        Tambah
+                    </a>
                 </div>
+                <table class="w-full text-md text-left rtl:text-right text-[var(--txt-primary2)] border-collapse">
+                    <thead
+                        class="text-lg text-[var(--txt-primary2)] bg-[var(--bg-secondary3)]/50 uppercase border-b border-[var(--bg-primary)]/10">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                ID
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Nama Gambar
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Gambar
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-end">
+                                Aksi
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <?php
+                        if ($ambilMainImg && mysqli_num_rows($ambilMainImg) > 0) {
+                            while ($tampilMainImg = mysqli_fetch_array($ambilMainImg)) {
+                        ?>
+
+                                <tr
+                                    class="bg-transparent border-b border-[var(--bg-primary)]/20 hover:bg-[var(--bg-primary)]/10">
+                                    <th scope="row"
+                                        class="px-6 py-4 font-medium text-[var(--txt-primary2)] whitespace-nowrap">
+                                        <?= htmlspecialchars($tampilMainImg['id_content_img']); ?>
+                                    </th>
+                                    <td class="px-6 py-4">
+                                        <?= htmlspecialchars($tampilMainImg['nama_img']); ?>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <img src="../../assets/img/galeri/<?= htmlspecialchars($tampilMainImg['img_content']); ?>"
+                                            alt="Galeri">
+                                    </td>
+                                    <td class="px-6 py-4 text-right space-y-2">
+                                        <a href="../crud/ubah-content-img.php?kode=<?= $tampilMainImg['id_content_img']; ?>" class="font-medium text-md sm:text-lg text-yellow-600 hover:underline">
+                                            UBAH
+                                        </a>
+                                        <button data-modal-target="modalHapusContentImg<?= $tampilMainImg['id_content_img']; ?>" data-modal-toggle="modalHapusContentImg<?= $tampilMainImg['id_content_img']; ?>" class="font-medium text-md lg:text-lg text-red-600 hover:underline">
+                                            HAPUS
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Modal Data - Delete -->
+                                <div id="modalHapusContentImg<?= $tampilMainImg['id_content_img']; ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                                    <div class="relative p-4 w-full max-w-md max-h-full">
+                                        <div class="relative bg-[var(--bg-primary)] rounded-lg shadow-sm">
+                                            <button type="button" class="absolute top-3 end-2.5 text-[var(--txt-primary)]/50 bg-transparent hover:bg-[var(--txt-primary)]/30 hover:text-[var(--txt-primary)]/80 rounded-xl text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer" data-modal-hide="modalHapusContentImg<?= $tampilMainImg['id_content_img']; ?>">
+                                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                                </svg>
+                                                <span class="sr-only">Close modal</span>
+                                            </button>
+                                            <div class="p-4 md:p-5 text-center">
+                                                <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                </svg>
+                                                <h3 class="mb-5 text-lg font-normal text-[var(--txt-primary)]/60">
+                                                    Yakin ingin menghapus data ini?
+                                                </h3>
+                                                <button data-modal-hide="modalHapusContentImg<?= $tampilMainImg['id_content_img']; ?>" type="button" class="cursor-pointer py-2.5 px-5 text-sm font-medium text-[var(--txt-primary)] focus:outline-none bg-[var(--bg-secondary3)]/0 rounded-lg border border-[var(--bg-secondary3)]/30 hover:bg-[var(--bg-secondary3)]/10 hover:text-[var(--txt-primary)] focus:z-10 ">
+                                                    Cancel
+                                                </button>
+                                                <a href="main-content.php?kode=<?= $tampilMainImg['id_content_img']; ?>" class="ms-2 text-[var(--txt-primary)] bg-[var(--text-danger)]/80 hover:bg-[var(--text-danger)] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">
+                                                    Hapus
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            <?php
+                            }
+                        } else {
+                            ?>
+                            <tr>
+                                <td class="px-6 py-8 text-center" colspan="7">
+                                    Tidak ada data yang cocok dengan filter/pencarian/data tidak tersedia.
+                                </td>
+                            </tr>
+                        <?php
+                        }
+                        ?>
+
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

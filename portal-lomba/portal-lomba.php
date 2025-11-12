@@ -18,9 +18,12 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
 $input_lomba = mysqli_query($koneksi, "SELECT * FROM tb_input_lomba WHERE status='aktif' ORDER BY id ASC");
 
 // Query Ambil Data dari table main content
-$sql = "SELECT * FROM tb_main_content";
-$ambilMain = mysqli_query($koneksi, $sql);
-$tampilMain = mysqli_fetch_assoc($ambilMain);
+$sqlText = "SELECT * FROM tb_main_content_text";
+$ambilMainText = mysqli_query($koneksi, $sqlText);
+$tampilMainText = mysqli_fetch_assoc($ambilMainText);
+
+$sqlImg = "SELECT * FROM tb_main_content_img";
+$ambilMainImg = mysqli_query($koneksi, $sqlImg);
 
 // Cek apakah tombol kirim ditekan
 if (isset($_POST['kirim'])) {
@@ -156,25 +159,25 @@ if (isset($_POST['kirim'])) {
             </h2>
             <h1 class="text-2xl md:text-4xl lg:text-6xl text-center my-4 md:my-8 text-[var(--bg-secondary2)] font-bold" data-aos="zoom-in" data-aos-duration="1500"
                 data-aos-delay="1000">
-                <?= $tampilMain['judul_portal']; ?>
+                <?= $tampilMainText['judul_portal']; ?>
             </h1>
             <p
                 class="text-md md:text-xl lg:text-2xl text-justify text-[var(--txt-primary2)] w-full lg:w-3/4 mx-auto leading-6 md:leading-8 lg:leading-11 font-light" data-aos="fade-up" data-aos-duration="1000"
                 data-aos-delay="2000">
-                <?= $tampilMain['deskripsi']; ?>.
+                <?= $tampilMainText['deskripsi']; ?>.
             </p>
             <div class="flex flex-col lg:flex-row items-center justify-center mt-12 gap-4 lg:gap-10">
-                <a href="<?= $tampilMain['link_teknis']; ?>"
+                <a href="<?= $tampilMainText['link_teknis']; ?>"
                     class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank" data-aos="fade-up" data-aos-duration="500"
                     data-aos-delay="1500">
                     TEKNIS LOMBA
                 </a>
-                <a href="<?= $tampilMain['link_reels']; ?>"
+                <a href="<?= $tampilMainText['link_reels']; ?>"
                     class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank" data-aos="fade-up" data-aos-duration="500"
                     data-aos-delay="2000">
                     REELS INFORMASI LOMBA
                 </a>
-                <a href="<?= $tampilMain['link_contact']; ?>"
+                <a href="<?= $tampilMainText['link_contact']; ?>"
                     class="w-full text-center py-2 md:px-8 md:py-4 rounded-full bg-[var(--bg-secondary2)] text-[var(--txt-primary)] font-bold text-md md:text-2xl cursor-pointer hover:bg-[var(--bg-secondary2)]/20 hover:text-[var(--txt-primary2)] border border-[var(--bg-secondary2)] transition duration-500 shadow-md hover:shadow-none" target="_blank" data-aos="fade-up" data-aos-duration="500"
                     data-aos-delay="2500">
                     CONTACT PERSON
@@ -182,18 +185,18 @@ if (isset($_POST['kirim'])) {
             </div>
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mt-12 md:mt-18 mb-32 gap-4" data-aos="fade-up" data-aos-duration="1000"
                 data-aos-delay="3000">
-                <img src="../assets/img/galeri/<?= $tampilMain['gambar_1']; ?>"
-                    class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
-                    alt="Galeri" />
-                <img src="../assets/img/galeri/<?= $tampilMain['gambar_2']; ?>"
-                    class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
-                    alt="Galeri" />
-                <img src="../assets/img/galeri/<?= $tampilMain['gambar_3']; ?>"
-                    class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
-                    alt="Galeri" />
-                <img src="../assets/img/galeri/<?= $tampilMain['gambar_4']; ?>"
-                    class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
-                    alt="Galeri" />
+
+                <?php
+                while ($tampilMainImg = mysqli_fetch_array($ambilMainImg)) {
+                ?>
+
+                    <img src="../assets/img/galeri/<?= $tampilMainImg['img_content']; ?>"
+                        class="mx-auto p-2 sm:p-4 md:p-6 lg:p-6 bg-[var(--bg-secondary)] rounded-3xl hover:bg-[var(--bg-secondary)]/40 transition duration-500 border-2 border-[var(--bg-secondary)] cursor-pointer hover:scale-101 shadow-md"
+                        alt="Galeri" />
+
+                <?php
+                }
+                ?>
             </div>
         </div>
     </section>

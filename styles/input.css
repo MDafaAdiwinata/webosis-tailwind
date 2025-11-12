@@ -34,7 +34,7 @@
 }
 
 #heroSection {
-  background: url(../assets/img/bg-hero.png) no-repeat center;
+  background: url(../assets/img/bg-hero.webp) no-repeat center;
   background-size: cover;
 }
 
@@ -42,6 +42,10 @@
     font-family: 'text-security-disc';
     -webkit-text-security: disc;
     -moz-text-security: disc;
-    text-security: disc;
     letter-spacing: 2px;
+}
+
+
+#navbar {
+  transition: transform 0.4s ease-in-out;
 }

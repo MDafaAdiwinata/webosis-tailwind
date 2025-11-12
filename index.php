@@ -76,7 +76,7 @@ if (isset($_POST['kirim'])) {
   <!-- Navbar -->
 
   <nav class="bg-transparent fixed top-0 left-0 right-0 z-50 transition duration-500" data-aos="fade-down" data-aos-duration="1500"
-    data-aos-delay="3000">
+    data-aos-delay="3000" id="navbar">
     <div class="flex flex-wrap items-center justify-between mx-auto py-4 px-8 md:p-6 lg:px-10 lg:py-8">
       <a href="" class="flex items-center space-x-0 md:space-x-3 rtl:space-x-reverse">
         <img src="assets/img/logo-osis.png" class="ms-0 h-10 md:h-15 lg:h-20" alt="Flowbite Logo" />
@@ -578,6 +578,34 @@ if (isset($_POST['kirim'])) {
   </footer>
 
   <!-- Tutup Footer -->
+
+  <!-- Navbar Hilang/Muncul -->
+  <script>
+    let lastScrollTop = 0;
+    const navbar = document.getElementById("navbar");
+    const scrollThreshold = 800;
+
+    window.addEventListener("scroll", function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (scrollTop > scrollThreshold) {
+        if (scrollTop > lastScrollTop) {
+          // Scroll Down
+          navbar.style.top = "-160px";
+          navbar.style.transition = "top 0.4s ease";
+        } else {
+          // Scroll Up
+          navbar.style.top = "0";
+          navbar.style.transition = "top 0.4s ease";
+        }
+      } else {
+        // Dalam threshold, navbar tetap visible
+        navbar.style.top = "0";
+      }
+
+      lastScrollTop = scrollTop;
+    });
+  </script>
 
   <!-- Scroll Logic Navbar -->
   <script>
